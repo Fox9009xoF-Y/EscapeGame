@@ -193,3 +193,13 @@
 - 本步產物：maps.js、index.html 載入順序及 main.js 渲染串接；evidence/phase2-*.png 保留三房與小視窗證據。tools/verify-phase2.cjs 為開發端 Chrome 驗證工具，遊戲無須安裝 Playwright。
 - 完整瀏覽器重驗指令（環境需提供 Playwright）：設定 NODE_PATH 為該環境套件路徑後執行 node tools/verify-phase2.cjs；先啟動本機 127.0.0.1:8000 靜態伺服器。此環境套件路徑為 C:/Users/nicho/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules。
 - 之前已完成 Step 0、Phase 1 已從頭重驗：規劃與原檔雜湊、全部迴圈測試、Chrome 解析度與置中。60/120/144 Hz 是模擬時間戳測試，未聲稱以三種實體螢幕測試。
+
+
+## Phase 3 本步計畫
+- 使用者已暫時確認 Phase 2；正五邊形與正六邊形保留待 Phase 5 地圖互動完成後共同確認，不視為使用者最終驗收通過。
+- 範圍：player.js 的 Input/Player、WASD/方向鍵、斜向正規化、放鍵/失焦/隱藏清空、連續掃掠與法線投影滑動；對內牆線段與矩形障礙進行碰撞。
+- 玩家採暫時簡單圖形，四向 Sprite/動畫留 Phase 4；各房加入一個可見石造方形障礙以便驗證不可通行物件，正式傢俱與深度排序留 Phase 4。
+- 碰撞盒採腳部 AABB（半寬8、半高6），用方向法線支撐距離縮小可走區；對障礙作 Minkowski 擴張與射線掃掠，計算最早接觸時間並保留剩餘切向位移，避免高速穿模與角落抖動。
+- 先紅燈：八種按鍵、文字輸入不干擾、斜向與重複按鍵、相反鍵、放鍵/blur/hidden、三房48方向高速邊角、斜牆滑動與脫離、四方向障礙掃掠與貼邊、暫時繪圖、入口整合。
+- 建構仍為純前端無打包；python -m http.server 8000；node --test tests/*.test.cjs 回歸 Step 0/Phase 1/Phase 2/Phase 3。獨立 Chrome 重驗前階段截圖及本步鍵盤、碰撞、固定相機；實機方式與未確認部分記入 TEST.md。
+- 狀態：測試先行，尚未實作。
