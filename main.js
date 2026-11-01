@@ -66,6 +66,7 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (typeof RoomMaps !== 'undefined') {
     RoomMaps.draw(ctx, playerSession ? [playerSession.player] : []);
+    if (typeof DoorLabels !== 'undefined') DoorLabels.render(document.getElementById('door-labels'), RoomMaps.currentMap);
     if (interactionController) interactionController.draw(ctx);
     return;
   }

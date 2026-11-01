@@ -109,7 +109,7 @@ globalThis.PlayerSystem = (() => {
     constructor(x = 640, y = 360) {
       this.x = x; this.y = y;
       this.halfWidth = 8; this.halfHeight = 6;
-      this.speed = 180;
+      this.speed = 360;
       this.direction = 'down';
       this.moving = false;
       this.animationTime = 0;

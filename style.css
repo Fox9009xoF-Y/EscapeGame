@@ -13,10 +13,24 @@ body {
   place-items: center;
 }
 
+.game-stage {
+  position: relative;
+  width: min(1280px, 100vw, calc(100dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+}
+
 canvas {
   display: block;
-  width: min(1280px, 100vw, calc(100dvh * 16 / 9));
+  width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
   image-rendering: pixelated;
+}
+
+#door-labels {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }

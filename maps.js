@@ -171,10 +171,6 @@ globalThis.RoomMaps = (() => {
       ctx.fillStyle = '#a18046';
       ctx.fillRect(room.bounds.left, room.bounds.top, room.bounds.right - room.bounds.left, room.bounds.bottom - room.bounds.top);
       ctx.restore();
-      ctx.fillStyle = '#d4c3a1';
-      ctx.font = '14px sans-serif';
-      const label = { living: '客廳', bedroom: '臥室', library: '藏書房' }[door.target];
-      ctx.fillText(`→ ${label}`, door.innerCenter.x + n.x * 54, door.innerCenter.y + n.y * 54);
     }
     ctx.restore();
 

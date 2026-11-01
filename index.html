@@ -10,11 +10,15 @@
   <script src="player.js" defer></script>
   <script src="portals.js" defer></script>
   <script src="interactions.js" defer></script>
+  <script src="door-labels.js" defer></script>
   <script src="main.js" defer></script>
 </head>
 <body>
+  <div class="game-stage">
   <canvas id="game" width="1280" height="720" aria-label="Escape Game 遊戲畫面">
     請使用支援 HTML5 Canvas 的瀏覽器開啟遊戲。
   </canvas>
+  <svg id="door-labels" viewBox="0 0 1280 720" role="img" aria-label="門外目的房間指引"></svg>
+  </div>
 </body>
 </html>
