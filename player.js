@@ -204,7 +204,9 @@ globalThis.PlayerSystem = (() => {
 
   function createSession(target, document, room) {
     const input = new Input(target, document), player = new Player();
-    return { player, input, update: dt => player.update(dt, input, room), draw: ctx => player.draw(ctx) };
+    let activeRoom = room;
+    return { player, input, setRoom: next => { activeRoom = next; },
+      update: dt => player.update(dt, input, activeRoom), draw: ctx => player.draw(ctx) };
   }
   return { Input, Player, createSession, drawSorted };
 })();

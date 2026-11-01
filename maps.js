@@ -4,6 +4,26 @@ globalThis.RoomMaps = (() => {
   const center = Object.freeze({ x: 640, y: 360 });
   const wallThickness = 24;
 
+  function makePortals(room) {
+    const routes = room.id === 'living' ? ['bedroom'] : room.id === 'bedroom' ? ['living', 'library'] : ['bedroom'];
+    return Object.freeze(routes.map(target => {
+      const right = room.id === 'living' || target === 'library';
+      const edgeIndex = room.edges.findIndex(({ start: a, end: b }) => {
+        const x = (a.x + b.x) / 2, y = (a.y + b.y) / 2;
+        return room.id === 'living' ? x > center.x && Math.abs(a.x - b.x) < 1e-6
+          : y > center.y && (right ? x > center.x : x < center.x) && Math.abs(a.y - b.y) > 1;
+      });
+      const { start: a, end: b } = room.edges[edgeIndex];
+      const length = Math.hypot(b.x - a.x, b.y - a.y);
+      const tangent = Object.freeze({ x: (b.x - a.x) / length, y: (b.y - a.y) / length });
+      const normal = Object.freeze({ x: -tangent.y, y: tangent.x });
+      const midpoint = Object.freeze({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+      return Object.freeze({ id: `${room.id}-${target}`, target, destination: `${target}-${room.id}`, edgeIndex,
+        width: 64, center: midpoint, tangent, normal,
+        innerCenter: Object.freeze({ x: midpoint.x + normal.x * wallThickness, y: midpoint.y + normal.y * wallThickness }) });
+    }));
+  }
+
   class RoomMap {
     constructor(id, name, sides, radius, rotation) {
       this.id = id;
@@ -36,6 +56,7 @@ globalThis.RoomMaps = (() => {
           ctx.fillRect(collision.x, collision.y - 48, collision.width, collision.height + 48);
         },
       })));
+      this.portals = makePortals(this);
       Object.freeze(this);
     }
   }
@@ -46,7 +67,13 @@ globalThis.RoomMaps = (() => {
     new RoomMap('library', '藏書房', 6, 300, 0),
   ]);
   const selected = new URLSearchParams(location.search).get('room');
-  const currentMap = maps.find(room => room.id === selected) || maps[0];
+  let currentMap = maps.find(room => room.id === selected) || maps[0];
+  function setCurrentMap(id) {
+    const next = maps.find(room => room.id === id);
+    if (!next) return false;
+    currentMap = next;
+    return true;
+  }
   const tileset = new Image();
   let assetState = 'loading';
   tileset.onload = () => { assetState = 'ready'; };
@@ -99,6 +126,23 @@ globalThis.RoomMaps = (() => {
     ctx.fillStyle = 'rgba(12, 14, 22, 0.25)';
     ctx.fillRect(room.bounds.left, room.bounds.top, room.bounds.right - room.bounds.left, room.bounds.bottom - room.bounds.top);
     ctx.restore();
+    for (const door of room.portals) {
+      const { center: c, normal: n, tangent: t, width } = door;
+      const points = [-1, 1].map(sign => ({ x: c.x + t.x * width / 2 * sign, y: c.y + t.y * width / 2 * sign }));
+      ctx.save();
+      ctx.beginPath();
+      path(ctx, [points[0], points[1],
+        { x: points[1].x + n.x * wallThickness, y: points[1].y + n.y * wallThickness },
+        { x: points[0].x + n.x * wallThickness, y: points[0].y + n.y * wallThickness }]);
+      ctx.clip();
+      ctx.fillStyle = '#a18046';
+      ctx.fillRect(room.bounds.left, room.bounds.top, room.bounds.right - room.bounds.left, room.bounds.bottom - room.bounds.top);
+      ctx.restore();
+      ctx.fillStyle = '#d4c3a1';
+      ctx.font = '14px sans-serif';
+      const label = { living: '客廳', bedroom: '臥室', library: '藏書房' }[door.target];
+      ctx.fillText(`→ ${label}`, door.innerCenter.x + n.x * 54, door.innerCenter.y + n.y * 54);
+    }
     ctx.restore();
 
     [...room.objects, ...entities].sort((a, b) => a.depth - b.depth).forEach(entity => entity.draw(ctx));
@@ -107,5 +151,5 @@ globalThis.RoomMaps = (() => {
     ctx.fillText(room.name, center.x, 30);
   }
 
-  return { Map: RoomMap, maps, currentMap, draw };
+  return { Map: RoomMap, maps, get currentMap() { return currentMap; }, setCurrentMap, draw };
 })();

@@ -52,9 +52,11 @@ const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const playerSession = typeof PlayerSystem !== 'undefined' && typeof RoomMaps !== 'undefined'
   ? PlayerSystem.createSession(globalThis, document, RoomMaps.currentMap) : null;
+const portalController = playerSession && typeof PortalSystem !== 'undefined' ? new PortalSystem.Controller(RoomMaps) : null;
 
 function update(deltaSeconds) {
   if (playerSession) playerSession.update(deltaSeconds);
+  if (portalController) portalController.update(playerSession);
 }
 
 function draw() {
