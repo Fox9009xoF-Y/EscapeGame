@@ -25,6 +25,8 @@ globalThis.RoomMaps = (() => {
         left: Math.min(...this.vertices.map(p => p.x)), right: Math.max(...this.vertices.map(p => p.x)),
         top: Math.min(...this.vertices.map(p => p.y)), bottom: Math.max(...this.vertices.map(p => p.y)),
       });
+      // Phase 3 的可見石造障礙；正式傢俱與深度排序在 Phase 4 加入。
+      this.obstacles = Object.freeze([Object.freeze({ x: 704, y: 352, width: 48, height: 48 })]);
       Object.freeze(this);
     }
   }
@@ -89,6 +91,12 @@ globalThis.RoomMaps = (() => {
     ctx.fillRect(room.bounds.left, room.bounds.top, room.bounds.right - room.bounds.left, room.bounds.bottom - room.bounds.top);
     ctx.restore();
     ctx.restore();
+
+    for (const box of room.obstacles) {
+      ctx.drawImage(tileset, 16, 68, 16, 12, box.x, box.y, box.width, box.height);
+      ctx.fillStyle = 'rgba(12, 14, 22, 0.25)';
+      ctx.fillRect(box.x, box.y, box.width, box.height);
+    }
 
     ctx.fillStyle = '#c6c1b1';
     ctx.fillText(room.name, center.x, 30);

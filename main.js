@@ -50,9 +50,11 @@ function createGameLoop({ update, draw }) {
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
+const playerSession = typeof PlayerSystem !== 'undefined' && typeof RoomMaps !== 'undefined'
+  ? PlayerSystem.createSession(globalThis, document, RoomMaps.currentMap) : null;
 
-function update(_deltaSeconds) {
-  // 玩家與互動狀態於後續階段加入；相機始終固定。
+function update(deltaSeconds) {
+  if (playerSession) playerSession.update(deltaSeconds);
 }
 
 function draw() {
@@ -60,6 +62,7 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (typeof RoomMaps !== 'undefined') {
     RoomMaps.draw(ctx);
+    if (playerSession) playerSession.draw(ctx);
     return;
   }
   ctx.textAlign = 'center';

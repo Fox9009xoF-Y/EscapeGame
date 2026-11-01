@@ -120,6 +120,17 @@ test('玩家位置繪製與碰撞盒一致，無動畫素材時使用暫時圖�
   assert.ok(calls.length>0);assert.ok(calls.some(([x,y,w,h])=>x<=p.x && x+w>=p.x && y<=p.y && y+h>=p.y));
 });
 
+test('窄通道略偏向牆面仍持續前進，通道內不穿入上下障礙',()=>{
+  const {Player,maps}=load();
+  const room={id:'corridor',innerVertices:maps[0].innerVertices,obstacles:[
+    {x:550,y:230,width:200,height:58},{x:550,y:312,width:200,height:58},
+  ]};
+  const p=new Player(560,300);
+  for(let i=0;i<80;i++){p.move(2,-0.3,room);inside(p,room);}
+  assert.ok(p.x>719.9,'輕微偏離通道不得卡住');
+  assert.ok(p.y>=294-1e-6 && p.y<300);
+});
+
 test('實際入口串接 Input/Player，RAF 按鍵更新而地圖保持固定',()=>{
   const {sandbox}=load(),win=target(),doc=target();
   const ctx={};for(const method of ['save','restore','beginPath','moveTo','lineTo','closePath','clip','drawImage','fillRect','fillText'])ctx[method]=()=>{};
