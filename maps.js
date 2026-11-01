@@ -27,6 +27,15 @@ globalThis.RoomMaps = (() => {
       });
       // Phase 3 的可見石造障礙；正式傢俱與深度排序在 Phase 4 加入。
       this.obstacles = Object.freeze([Object.freeze({ x: 704, y: 352, width: 48, height: 48 })]);
+      this.objects = Object.freeze(this.obstacles.map(collision => Object.freeze({
+        collision, depth: collision.y + collision.height,
+        draw(ctx) {
+          // 柱子上半部可遮擋角色，底座碰撞盒沿用前一步。
+          ctx.drawImage(tileset, 16, 68, 16, 12, collision.x, collision.y - 48, collision.width, collision.height + 48);
+          ctx.fillStyle = 'rgba(12, 14, 22, 0.25)';
+          ctx.fillRect(collision.x, collision.y - 48, collision.width, collision.height + 48);
+        },
+      })));
       Object.freeze(this);
     }
   }
@@ -60,7 +69,7 @@ globalThis.RoomMaps = (() => {
     }
   }
 
-  function draw(ctx) {
+  function draw(ctx, entities = []) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = '18px sans-serif';
@@ -92,11 +101,7 @@ globalThis.RoomMaps = (() => {
     ctx.restore();
     ctx.restore();
 
-    for (const box of room.obstacles) {
-      ctx.drawImage(tileset, 16, 68, 16, 12, box.x, box.y, box.width, box.height);
-      ctx.fillStyle = 'rgba(12, 14, 22, 0.25)';
-      ctx.fillRect(box.x, box.y, box.width, box.height);
-    }
+    [...room.objects, ...entities].sort((a, b) => a.depth - b.depth).forEach(entity => entity.draw(ctx));
 
     ctx.fillStyle = '#c6c1b1';
     ctx.fillText(room.name, center.x, 30);

@@ -61,8 +61,7 @@ function draw() {
   ctx.fillStyle = '#171b20';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (typeof RoomMaps !== 'undefined') {
-    RoomMaps.draw(ctx);
-    if (playerSession) playerSession.draw(ctx);
+    RoomMaps.draw(ctx, playerSession ? [playerSession.player] : []);
     return;
   }
   ctx.textAlign = 'center';

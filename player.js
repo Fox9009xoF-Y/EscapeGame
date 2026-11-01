@@ -2,6 +2,17 @@
 
 globalThis.PlayerSystem = (() => {
   const epsilon = 1e-8;
+  const spriteImages = {};
+  for (const source of ['hero-sprites.png', 'hero-back-walk.png']) {
+    const image = new Image();
+    const asset = { image, ready: false };
+    spriteImages[source] = asset;
+    image.onload = () => { asset.ready = true; };
+    image.src = source;
+  }
+  function drawSorted(ctx, entities) {
+    [...entities].sort((a, b) => a.depth - b.depth).forEach(entity => entity.draw(ctx));
+  }
   const bindings = {
     KeyW: [0, -1], ArrowUp: [0, -1], KeyA: [-1, 0], ArrowLeft: [-1, 0],
     KeyS: [0, 1], ArrowDown: [0, 1], KeyD: [1, 0], ArrowRight: [1, 0],
@@ -85,6 +96,7 @@ globalThis.PlayerSystem = (() => {
       this.speed = 180;
       this.direction = 'down';
       this.moving = false;
+      this.animationTime = 0;
     }
 
     update(deltaSeconds, input, room) {
@@ -96,6 +108,19 @@ globalThis.PlayerSystem = (() => {
       if (Number.isFinite(deltaSeconds) && deltaSeconds > 0) {
         this.move(direction.x * this.speed * deltaSeconds, direction.y * this.speed * deltaSeconds, room);
       }
+      this.animationTime = this.moving && Number.isFinite(deltaSeconds) && deltaSeconds > 0
+        ? (this.animationTime + deltaSeconds) % 0.48 : 0;
+    }
+
+    get depth() { return this.y + this.halfHeight; }
+
+    spriteFrame() {
+      const index = this.moving ? [0, 1, 2, 1][Math.floor(this.animationTime / 0.12) % 4] : 0;
+      const back = this.direction === 'up';
+      return { asset: back ? 'hero-back-walk.png' : 'hero-sprites.png',
+        sx: (back ? 0 : 16) + index * 16,
+        sy: back ? 0 : this.direction === 'down' ? 16 : 32,
+        flip: this.direction === 'left' };
     }
 
     move(dx, dy, room) {
@@ -158,6 +183,16 @@ globalThis.PlayerSystem = (() => {
       // 暫時角色標記，正式 Sprite 與四向動畫於 Phase 4 接上。
       ctx.fillStyle = '#22232c';
       ctx.fillRect(this.x - 8, this.y + 1, 16, 6);
+      const frame = this.spriteFrame(), asset = spriteImages[frame.asset];
+      if (asset.ready && ctx.drawImage) {
+        const size = 32;
+        if (frame.flip) {
+          ctx.save(); ctx.translate(this.x, this.y + this.halfHeight); ctx.scale(-1, 1);
+          ctx.drawImage(asset.image, frame.sx, frame.sy, 16, 16, -size / 2, -size, size, size);
+          ctx.restore();
+        } else ctx.drawImage(asset.image, frame.sx, frame.sy, 16, 16, this.x - size / 2, this.y + this.halfHeight - size, size, size);
+        return;
+      }
       ctx.fillStyle = '#bdc5bc';
       ctx.fillRect(this.x - 7, this.y - 12, 14, 16);
       ctx.fillStyle = '#e5ccb0';
@@ -171,5 +206,5 @@ globalThis.PlayerSystem = (() => {
     const input = new Input(target, document), player = new Player();
     return { player, input, update: dt => player.update(dt, input, room), draw: ctx => player.draw(ctx) };
   }
-  return { Input, Player, createSession };
+  return { Input, Player, createSession, drawSorted };
 })();
