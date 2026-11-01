@@ -21,20 +21,36 @@ globalThis.PlayerSystem = (() => {
   class Input {
     constructor(target, document) {
       this.keys = new Set();
+      this.spaceDown = false;
+      this.interactQueued = false;
+      const clear = () => { this.keys.clear(); this.spaceDown = false; this.interactQueued = false; };
       target.addEventListener('keydown', event => {
-        if (!Object.hasOwn(bindings, event.code)) return;
         if (event.target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName)) return;
+        if (event.code === 'Space') {
+          event.preventDefault();
+          if (!this.spaceDown && !event.repeat) this.interactQueued = true;
+          this.spaceDown = true;
+          return;
+        }
+        if (!Object.hasOwn(bindings, event.code)) return;
         event.preventDefault();
         this.keys.add(event.code);
       });
       target.addEventListener('keyup', event => {
+        if (event.code === 'Space') { this.spaceDown = false; return; }
         if (!Object.hasOwn(bindings, event.code)) return;
         this.keys.delete(event.code);
       });
-      target.addEventListener('blur', () => this.keys.clear());
+      target.addEventListener('blur', clear);
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) this.keys.clear();
+        if (document.hidden) clear();
       });
+    }
+
+    consumeInteract() {
+      const pressed = this.interactQueued;
+      this.interactQueued = false;
+      return pressed;
     }
 
     direction() {

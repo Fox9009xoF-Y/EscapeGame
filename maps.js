@@ -46,10 +46,39 @@ globalThis.RoomMaps = (() => {
         top: Math.min(...this.vertices.map(p => p.y)), bottom: Math.max(...this.vertices.map(p => p.y)),
       });
       // Phase 3 的可見石造障礙；正式傢俱與深度排序在 Phase 4 加入。
-      this.obstacles = Object.freeze([Object.freeze({ x: 704, y: 352, width: 48, height: 48 })]);
-      this.objects = Object.freeze(this.obstacles.map(collision => Object.freeze({
+      const furniture = id === 'living' ? { role:'sofa',title:'舊沙發',text:'沙發坐墊凹下了一角，布面還留著一點溫度。',x:480,y:188,width:104,height:56 }
+        : id === 'bedroom' ? { role:'bed',title:'整理好的床',text:'被子折得很整齊。枕頭旁有幾道細長的抓痕。',x:548,y:180,width:64,height:72 }
+        : { role:'bookshelf',title:'藏書架',text:'書背都蒙著灰，只有一本書像是剛被放回去。',x:565,y:176,width:150,height:64 };
+      this.obstacles = Object.freeze([Object.freeze({ x: 704, y: 352, width: 48, height: 48 }),
+        Object.freeze({x:furniture.x,y:furniture.y,width:furniture.width,height:furniture.height})]);
+      this.objects = Object.freeze(this.obstacles.map((collision,index) => Object.freeze({
+        id:`${id}-${index}`,role:index===0?'pillar':furniture.role,
+        title:index===0?'冰冷的石柱':furniture.title,
+        text:index===0?'石柱背後刻著幾道深痕，像是有人曾在這裡等了很久。':furniture.text,
         collision, depth: collision.y + collision.height,
         draw(ctx) {
+          if (index === 1) {
+            const {x,y,width:w,height:h}=collision;
+            const rect=(color,rx,ry,rw,rh)=>{ctx.fillStyle=color;ctx.fillRect(rx,ry,rw,rh);};
+            rect('#4d3426',x,y,w,h);
+            if(furniture.role==='sofa'){
+              rect('#653b3e',x+6,y+4,w-12,16);
+              rect('#875758',x+12,y+23,(w-30)/2,h-29);
+              rect('#875758',x+w/2+3,y+23,(w-30)/2,h-29);
+              rect('#ac9665',x+4,y+4,4,h-8);rect('#ac9665',x+w-8,y+4,4,h-8);
+            }else if(furniture.role==='bed'){
+              rect('#c7bca6',x+5,y+6,w-10,h-12);rect('#e6dfca',x+10,y+9,w-20,17);
+              rect('#713d40',x+5,y+30,w-10,h-36);rect('#a77464',x+5,y+31,w-10,4);
+            }else{
+              for(let row=0;row<2;row++)for(let col=0;col<15;col++){
+                const colors=['#716c52','#75424a','#4f666c','#b09b67'];
+                rect(colors[(row+col)%4],x+7+col*9,y+7+row*28,6,18+(col%3)*2);
+              }
+              rect('#a48a51',x+4,y+30,w-8,4);rect('#a48a51',x+4,y+h-7,w-8,3);
+            }
+            rect('#45272b',x+13,y+h+5,9,3);rect('#45272b',x+23,y+h+8,5,3);
+            return;
+          }
           // 柱子上半部可遮擋角色，底座碰撞盒沿用前一步。
           ctx.drawImage(tileset, 16, 68, 16, 12, collision.x, collision.y - 48, collision.width, collision.height + 48);
           ctx.fillStyle = 'rgba(12, 14, 22, 0.25)';
@@ -113,6 +142,10 @@ globalThis.RoomMaps = (() => {
     ctx.clip();
     // 圖片右上角為不含洋紅透明底的木色紋理。
     tile(ctx, room, [96, 0, 16, 16]);
+    // 低矮地毯屬地板層，可步行通過；三房皆保留完整外輪廓。
+    ctx.fillStyle = '#593b3c'; ctx.fillRect(540, 322, 124, 80);
+    ctx.fillStyle = '#9a8050'; ctx.fillRect(544, 326, 116, 72);
+    ctx.fillStyle = '#593b3c'; ctx.fillRect(548, 330, 108, 64);
     ctx.fillStyle = 'rgba(20, 15, 23, 0.22)';
     ctx.fillRect(room.bounds.left, room.bounds.top, room.bounds.right - room.bounds.left, room.bounds.bottom - room.bounds.top);
 

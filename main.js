@@ -53,10 +53,12 @@ ctx.imageSmoothingEnabled = false;
 const playerSession = typeof PlayerSystem !== 'undefined' && typeof RoomMaps !== 'undefined'
   ? PlayerSystem.createSession(globalThis, document, RoomMaps.currentMap) : null;
 const portalController = playerSession && typeof PortalSystem !== 'undefined' ? new PortalSystem.Controller(RoomMaps) : null;
+const interactionController = playerSession && typeof InteractionSystem !== 'undefined' ? new InteractionSystem.Controller(RoomMaps) : null;
 
 function update(deltaSeconds) {
   if (playerSession) playerSession.update(deltaSeconds);
   if (portalController) portalController.update(playerSession);
+  if (interactionController) interactionController.update(playerSession);
 }
 
 function draw() {
@@ -64,6 +66,7 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (typeof RoomMaps !== 'undefined') {
     RoomMaps.draw(ctx, playerSession ? [playerSession.player] : []);
+    if (interactionController) interactionController.draw(ctx);
     return;
   }
   ctx.textAlign = 'center';
