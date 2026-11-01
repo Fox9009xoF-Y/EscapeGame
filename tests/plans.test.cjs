@@ -24,9 +24,9 @@ test('每條驗收要求都有獨立規劃、階段與驗證方式', () => {
   });
 });
 
-test('包含六個未完成開發階段與必要執行流程', () => {
+test('包含六個開發階段（允許完成後勾選）與必要執行流程', () => {
   const plans = read('PLANS.md');
-  for (let phase = 1; phase <= 6; phase++) assert.ok(plans.includes(`- [ ] Phase ${phase}：`));
+  for (let phase = 1; phase <= 6; phase++) assert.match(plans, new RegExp(`^- \\[[ x]\\] Phase ${phase}：`, 'm'));
   for (const required of ['先紅燈', 'commit', '實機', 'TEST.md', '一次只做一步', 'node --test tests/*.test.cjs', 'python -m http.server 8000', '角色 Sprite']) {
     assert.ok(plans.includes(required), `缺少 ${required}`);
   }
