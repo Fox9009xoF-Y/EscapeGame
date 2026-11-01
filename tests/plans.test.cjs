@@ -7,7 +7,11 @@ const root = path.resolve(__dirname, '..');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 
 test('VERIFY.md 保持使用者原始內容', () => {
-  const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(root, 'VERIFY.md'))).digest('hex');
+  // 使用者本次只授權新增這段角色風格；剝除後仍必須逐位元符合原驗收檔。
+  const authorized = '角色風格：使用專案內 Old hero.png；正面行走保留原圖影格，僅背面行走以角色膚色覆蓋正面影格的臉部；左右使用原圖側面影格與鏡像。\r\n\r\n';
+  const content = read('VERIFY.md');
+  assert.ok(content.split(authorized).length <= 2);
+  const hash = crypto.createHash('sha256').update(content.replace(authorized, '')).digest('hex');
   assert.equal(hash, 'd2b70a2891088799a9000645d33d5fe74e5e4d8e44ab0bed26e52d3642d448dc');
 });
 
