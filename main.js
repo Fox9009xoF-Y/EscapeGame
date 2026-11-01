@@ -52,12 +52,16 @@ const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 
 function update(_deltaSeconds) {
-  // Phase 1 僅建立迴圈；後續階段在此更新遊戲狀態。
+  // 玩家與互動狀態於後續階段加入；相機始終固定。
 }
 
 function draw() {
   ctx.fillStyle = '#171b20';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (typeof RoomMaps !== 'undefined') {
+    RoomMaps.draw(ctx);
+    return;
+  }
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#e0dfd7';
@@ -69,6 +73,8 @@ function draw() {
 }
 
 const gameLoop = createGameLoop({ update, draw });
+// 首次 RAF 可能稍晚執行，先填滿畫布以免短暫顯示透明空白。
+draw();
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) gameLoop.stop();
   else gameLoop.start();
