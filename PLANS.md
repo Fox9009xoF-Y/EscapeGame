@@ -1105,3 +1105,11 @@
 - 證據：evidence/n1-browser-results.json、n1-boundaries-results.json、六章畫面/各章最長台詞/800視窗/結束截圖；已目視第一章、第六章、800小視窗與第五章最長錄音台詞。
 - 驗證限制：Chrome 為 headless 真實渲染與自動鍵鼠，分頁隱藏透過 DOM 事件模擬；非使用者親自試玩，也未以新大門完成逃脫。93項個別結果記錄於 TEST.md，未做項目明示未完成。
 - 範圍：VERIFY/BRIEF/AGENTS、story1/2、v1/v2/v3、maps/player/portals/interactions/door-labels 與所有原素材未修改。N2–N6 保持未勾選，完成 N1 即停下回報。
+
+## N1 修正：雙擊 index.html 的本機劇本讀取（先紅燈）
+- 使用者回報 file:/// 下 Chrome 阻擋 fetch。此問題不會由 N2–N6 自動修好，本步專門處理啟動方式，不改地圖與謎題。
+- 方案：file 模式先顯示「選擇劇本檔案」，讓使用者一次選 story1.txt、story2.txt，以 File.text() 讀取原始外部文本；HTTP 模式維持自動 fetch/no-store。取消選擇不報錯，缺檔/重複檔/讀取失敗可重新選擇，不內嵌或複製劇本。
+- 限制：瀏覽器不能未經選擇自行讀取鄰近檔案；file 模式每次重新開啟/整理須重新選兩檔，修改劇本後重選即讀新內容。HTTP 模式維持修改文本後重新整理自動更新，沒有放寬 VERIFY。
+- TDD：新增 tests/n1-local-files.test.cjs，先確認本機載入介面/缺檔回復與選檔 UI 尚缺而失敗，再提交後實作；既有測試/需求/劇本/圖片不改。
+- 驗證：新增 Chrome file URL 選檔實測，包含開場/進地圖/結尾、取消/缺檔/重試與新內容；重跑 N1、Phase2–6/refinement、全部 Node 與 Python，逐條結果追加 TEST.md。
+- [ ] 本機啟動修正完成；完成本修正即停下，不提前做 N2。
