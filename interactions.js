@@ -10,10 +10,12 @@ globalThis.InteractionSystem = (() => {
     const overlap = b => b.x < box.x+box.width && b.x+b.width > box.x && b.y < box.y+box.height && b.y+b.height > box.y;
     const distance = b => player.direction === 'up' ? p.y-b.y-b.height : player.direction === 'down' ? b.y-p.y
       : player.direction === 'left' ? p.x-b.x-b.width : b.x-p.x;
-    const candidates = room.objects.filter(o => o.title && o.text && overlap(o.collision)).sort((a,b)=>distance(a.collision)-distance(b.collision));
+    const bounds = object => object.interactionBounds || object.collision;
+    const candidates = room.objects.filter(o => o.title && o.text && overlap(bounds(o)))
+      .sort((a,b)=>distance(bounds(a))-distance(bounds(b)) || (b.priority || 0)-(a.priority || 0));
     const target = candidates[0];
     if (!target) return null;
-    if (room.obstacles.some(b => b !== target.collision && overlap(b) && distance(b) < distance(target.collision))) return null;
+    if (room.obstacles.some(b => b !== target.collision && overlap(b) && distance(b) < distance(bounds(target)))) return null;
     return target;
   }
 

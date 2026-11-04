@@ -1,0 +1,73 @@
+{
+  "results": [
+    {
+      "room": "living",
+      "id": "living-celestial",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-switch",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-carpet-clue",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-desk",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-exit-bookshelf",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-0",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-1",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-2",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-3",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-4",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-pillow",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-word-clue",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-reward-marker",
+      "keyboardReachable": true
+    }
+  ],
+  "errors": [],
+  "exitLocked": true,
+  "puzzleLogicNotImplemented": true,
+  "headless": true
+}

@@ -24,6 +24,72 @@ globalThis.RoomMaps = (() => {
     }));
   }
 
+  function makeInteriors(id) {
+    const box = (x, y, width, height) => ({ x, y, width, height });
+    const defs = id === 'living' ? [
+      { id:'living-celestial', role:'celestial-wall', title:'天象牆', text:'牆上嵌著太陽、月亮與一圈星星。', bounds:box(624,140,148,52), solid:true },
+      { id:'living-switch', role:'light-switch', title:'牆邊開關', text:'牆邊有一個老舊的開關。', bounds:box(784,205,12,18) },
+      { id:'living-carpet-clue', role:'carpet-clue', title:'地毯的一角', text:'地毯的一角微微翹起，底下露出一張紙。', bounds:box(624,340,24,16), floor:true },
+      { id:'living-desk', role:'desk', title:'書桌抽屜', text:'書桌抽屜裡露出一張摺好的紙。', bounds:box(800,188,56,48), solid:true },
+      { id:'living-exit-bookshelf', role:'exit-bookshelf', title:'擋住門的書櫃', text:'書櫃後似乎有一道門。櫃側的鎖孔呈太陽形狀。', bounds:box(420,134,56,58), solid:true },
+      { id:'living-exit', role:'escape-door', title:'書櫃後的大門', text:'大門被書櫃擋住，現在無法通過。', bounds:box(420,106,56,24), interaction:box(420,134,56,58), priority:-1, parentId:'living-exit-bookshelf' },
+    ] : id === 'bedroom' ? [
+      ...[[492,480],[486,300],[704,214],[844,340],[716,502]].map(([x,y],i) => ({
+        id:`bedroom-lamp-${i}`, role:'oil-lamp', title:'油燈', text:'一盞安放在矮座上的油燈。',
+        bounds:box(x,y,16,28), collision:box(x,y+12,16,16), lampIndex:i, solid:true,
+      })),
+      { id:'bedroom-pillow', role:'pillow', title:'杰哥的抱枕', text:'床上放著一個印有杰哥模樣的長抱枕。', bounds:box(590,214,18,30), interaction:box(590,246,20,6), priority:2, parentId:'bedroom-1', depth:253 },
+    ] : [
+      { id:'library-word-clue', role:'word-clue', title:'書櫃裡的便條', text:'書頁間夾著一張寫有字句的紙。', bounds:box(692,208,14,22), interaction:box(688,234,24,6), priority:2, parentId:'library-1', depth:241 },
+      { id:'library-reward-marker', role:'reward-marker', title:'中央刻痕', text:'地板中央有一圈刻痕，中間空著。', bounds:box(626,346,28,28), interaction:box(626,374,28,8), floor:true },
+    ];
+    return defs.map(def => {
+      const visualBounds = Object.freeze(def.bounds);
+      const collision = def.collision ? Object.freeze(def.collision) : visualBounds;
+      const interactionBounds = def.interaction ? Object.freeze(def.interaction) : collision;
+      return Object.freeze({ id:def.id, role:def.role, title:def.title, text:def.text,
+        visualBounds, collision, interactionBounds, solid:!!def.solid,
+        priority:def.priority || 0, parentId:def.parentId, lampIndex:def.lampIndex,
+        depth:def.depth ?? (def.floor ? -10000 : visualBounds.y + visualBounds.height),
+        draw(ctx) {
+          const {x,y,width:w,height:h}=visualBounds;
+          const rect=(color,dx,dy,rw,rh)=>{ctx.fillStyle=color;ctx.fillRect(x+dx,y+dy,rw,rh);};
+          const polygon=(color,points)=>{ctx.save();ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x+points[0][0],y+points[0][1]);for(const [px,py]of points.slice(1))ctx.lineTo(x+px,y+py);ctx.closePath();ctx.clip();ctx.fillRect(x,y,w,h);ctx.restore();};
+          if(def.role==='celestial-wall') {
+            rect('#876746',0,0,w,h);rect('#171f32',4,4,w-8,h-8);
+            // 初始天象外觀；週期/旋轉/摘取由 N3 接入，不在內裝階段運作。
+            polygon('#d9b764',[[50,16],[56,12],[62,16],[66,22],[62,28],[56,32],[50,28],[46,22]]);
+            for(const [dx,dy]of [[54,7],[54,33],[39,20],[67,20]])rect('#d9b764',dx,dy,4,4);
+            polygon('#d9d5bf',[[104,12],[110,12],[116,18],[116,24],[110,30],[104,30],[98,24],[98,18]]);
+            polygon('#171f32',[[105,15],[109,15],[113,19],[113,23],[109,27],[105,27],[101,23],[101,19]]);
+            for(const [dx,dy]of [[17,11],[28,32],[82,8],[126,26],[92,38]]){rect('#c1c7d5',dx,dy,3,3);}
+          } else if(def.role==='light-switch') {
+            rect('#b0a68e',0,0,w,h);rect('#ddd1b2',3,3,6,8);rect('#544b40',3,12,6,3);
+          } else if(def.role==='carpet-clue'||def.role==='word-clue') {
+            rect('#d6c69f',0,0,w,h);for(let row=4;row<h-2;row+=5)rect('#817559',3,row,w-6,1);
+            if(def.role==='carpet-clue')polygon('#8b6a52',[[0,0],[8,0],[0,9]]);
+          } else if(def.role==='desk') {
+            rect('#3f2c24',0,0,w,h);rect('#9c784e',2,2,w-4,12);rect('#765536',4,18,w-8,h-22);rect('#d2b36d',w/2-3,24,6,3);
+          } else if(def.role==='exit-bookshelf') {
+            rect('#3d2b24',0,0,w,h);
+            for(let row=0;row<2;row++)for(let col=0;col<5;col++)rect(['#765348','#55656a','#9b8b55'][(col+row)%3],5+col*9,5+row*25,6,17);
+            rect('#b18c55',2,24,w-4,4);rect('#b18c55',2,h-6,w-4,4);rect('#dfb35b',w-7,30,4,5);
+          } else if(def.role==='escape-door') {
+            rect('#392b24',0,0,w,h);rect('#866543',4,1,w-8,h-1);rect('#2b2422',w/2-2,3,4,h-3);
+          } else if(def.role==='oil-lamp') {
+            rect('#5d5045',0,12,16,16);rect('#a38c5d',3,9,10,10);rect('#d4c7a1',6,3,4,10);rect('#2e292b',7,0,2,5);
+          } else if(def.role==='pillow') {
+            rect('#a48b75',0,0,w,h);rect('#ddd0ae',2,2,w-4,h-4);rect('#bd9471',5,8,8,8);
+            rect('#24272b',5,8,3,3);rect('#24272b',10,8,3,3);rect('#24272b',8,9,2,1);rect('#363a41',4,17,10,9);
+          } else if(def.role==='reward-marker') {
+            rect('#aa905c',0,0,w,2);rect('#aa905c',0,h-2,w,2);rect('#aa905c',0,0,2,h);rect('#aa905c',w-2,0,2,h);
+            rect('#aa905c',w/2-2,h/2-2,4,4);
+          }
+        },
+      });
+    });
+  }
+
   class RoomMap {
     constructor(id, name, sides, radius, rotation) {
       this.id = id;
@@ -85,6 +151,10 @@ globalThis.RoomMaps = (() => {
           ctx.fillRect(collision.x, collision.y - 48, collision.width, collision.height + 48);
         },
       })));
+      const interiors = makeInteriors(id);
+      this.obstacles = Object.freeze([...this.obstacles, ...interiors.filter(object => object.solid).map(object => object.collision)]);
+      this.objects = Object.freeze([...this.objects, ...interiors]);
+      if (id === 'living') this.exit = Object.freeze({ id:'living-exit', coverId:'living-exit-bookshelf', locked:true });
       this.portals = makePortals(this);
       Object.freeze(this);
     }
