@@ -1,0 +1,7 @@
+{
+  "clickPoints": 5,
+  "holdThreshold": 1500,
+  "interval": 250,
+  "observed": 5,
+  "stopped": true
+}

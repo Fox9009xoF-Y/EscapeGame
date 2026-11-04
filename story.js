@@ -78,14 +78,14 @@ globalThis.StorySystem = (() => {
     }
     press(source,now,repeat=false) {
       if(repeat||this.paused||this.holdSource||!['opening','ending'].includes(this.mode)) return;
-      this.holdSource=source;this.nextAdvance=now+3000;this.advance(now);
+      this.holdSource=source;this.nextAdvance=now+1500;this.advance(now);
     }
     release() {this.cancelHold();}
     cancelHold() {this.holdSource=null;this.nextAdvance=Infinity;}
     tick(now) {
       if(this.holdSource&&!this.paused&&now>=this.nextAdvance) {
         // 不補播背景停頓或低幀率期間的多句台詞。
-        this.nextAdvance=now+500;this.advance(now);
+        this.nextAdvance=now+250;this.advance(now);
       }
     }
     setPaused(paused) {this.paused=paused;this.cancelHold();this.notify();}
@@ -117,7 +117,7 @@ globalThis.StorySystem = (() => {
       get('door-labels').hidden=state.mode!=='puzzle';
       pause.textContent=state.paused?'繼續':'暫停';pause.setAttribute('aria-pressed',String(state.paused));
       dialogue.setAttribute('aria-disabled',String(state.paused));
-      get('story-guidance').textContent=state.paused?'已暫停 · 按右上角「繼續」恢復':'左鍵／空白鍵 下一句 · 按住 3 秒快轉，放開即停';
+      get('story-guidance').textContent=state.paused?'已暫停 · 按右上角「繼續」恢復':'左鍵／空白鍵 下一句 · 按住 1.5 秒快轉（每秒 4 句），放開即停';
       if(!active) {
         background.removeAttribute('src');cast.replaceChildren();chapterKey='';lastLine='';
         chapterLabel.textContent='';speaker.textContent='';text.textContent='';assetErrors.clear();showErrors();clearInput();return;
@@ -143,8 +143,8 @@ globalThis.StorySystem = (() => {
       lastLine=lineKey;
     }
     const now=()=>target.performance.now(),editable=e=>e.target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target?.tagName);
-    dialogue.addEventListener('pointerdown',e=>{
-      if(e.button!==0)return;e.preventDefault();dialogue.focus({preventScroll:true});dialogue.setPointerCapture(e.pointerId);controller.press('pointer',now());
+    target.addEventListener('pointerdown',e=>{
+      if(e.button!==0||!['opening','ending'].includes(controller.mode)||editable(e))return;e.preventDefault();dialogue.focus({preventScroll:true});dialogue.setPointerCapture(e.pointerId);controller.press('pointer',now());
     });
     target.addEventListener('pointerup',()=>controller.release());target.addEventListener('pointercancel',()=>controller.cancelHold());
     target.addEventListener('keydown',e=>{
