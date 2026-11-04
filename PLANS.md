@@ -1212,9 +1212,9 @@
 
 ## 本輪最終建構與交付紀錄
 - 純前端無打包：本機HTTP自動讀取劇本；file直接開啟仍須選兩份txt。依README操作。
-- TDD紅燈提交：1cba768劇情新操作、3243d52天象、af3c7f4油燈、02b2b2b文字追捕、6045929出口、41668b7星群幾何、73dd93d紙條比例；每次先失敗再實作，未修改斷言掩蓋問題。
+- TDD紅燈提交：1cba768劇情新操作、3243d52天象、af3c7f4油燈、02b2b2b文字追捕、6045929出口、41668b7星群幾何、73dd93d紙條比例、f67f2fa按鈕焦點；每次先失敗再實作，未修改斷言掩蓋問題。
 - N5綠燈fbc1fb3；N6完成鑰匙移櫃/開門/向外走、警報追捕清理與結尾，回溯也恢復書櫃碰撞。
-- Node96/96與Python素材1/1；Chrome Phase2–6/refinement、N1 HTTP/800版面/file選檔、N2 31調查點、新操作/紙條比例、N3–N6全部回歸。最後詳細紀錄evidence/final-browser-regression.log與TEST。
+- Node97/97與Python素材1/1；Chrome Phase2–6/refinement、N1 HTTP/800版面/file選檔、N2 31調查點、新操作/紙條比例、N3–N6全部回歸。最後詳細紀錄evidence/final-browser-regression.log與TEST。
 - PLANS更新：N5/N6勾選、93條當前狀態及舊V狀態同步；R051/R052保留原文但註明本輪新時序；R077按授權推定書籤，R092保留尚未試玩。
 - TEST記93條最新結果與測試維護原因；GAMEREPORT填A01–A11的推定/實作/限制；README更新實際可玩流程。VERIFY、BRIEF、AGENTS、原劇本/規格/素材保持本輪前原樣。
 
@@ -1222,3 +1222,5 @@
 
 ### N6回歸發現：按鈕焦點與方向鍵
 - 關閉線索後Chrome可能仍暫留按鈕焦點；N5為保留按鈕原生空白而忽略BUTTON，卻同時吞掉方向鍵。新增焦點按鈕時方向可走、空白不調查、輸入框不移動測試，確認失敗先提交，接著只對BUTTON的空白放行原生行為。
+
+- 最終版本確認：按鈕焦點修正後16項Chrome程序已從頭完成，Node97/97、Python1/1；evidence/final-suite-results.json彙整。驗收檔git物件077a7d52599c5f680a667a75b8eaeb4a1a2afa49與遠端原檔一致。

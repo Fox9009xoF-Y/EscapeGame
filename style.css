@@ -59,7 +59,7 @@ canvas {
 #puzzle-layer { position:absolute; inset:0; pointer-events:none; color:#f4e7cd; font-family:"Microsoft JhengHei",sans-serif; font-size:clamp(10px,1.3cqw,17px); }
 #puzzle-hud { position:absolute; top:2%; left:2%; right:2%; display:flex; align-items:center; gap:1em; pointer-events:none; }
 #puzzle-hud span { background:#111b24e8; padding:.4em .7em; border-radius:4px; }
-#puzzle-inventory { margin-left:auto; }
+#puzzle-inventory { margin-left:auto; display:inline-flex; align-items:center; gap:.6em; }
 #puzzle-layer button { pointer-events:auto; font:inherit; color:#f4e7cd; background:#26303a; border:1px solid #bc9e65; padding:.4em .8em; border-radius:4px; cursor:pointer; }
 #puzzle-notice { position:absolute; bottom:3%; left:15%; right:15%; text-align:center; background:#111b24e8; border-radius:4px; padding:.6em; }
 #puzzle-notice:empty { display:none; }
@@ -69,6 +69,6 @@ canvas {
 .puzzle-card header { display:flex; justify-content:space-between; align-items:center; gap:1em; }
 .puzzle-card h2 { font-size:1.25em; margin:.2em 0; }
 #puzzle-content { line-height:1.7; }
-#puzzle-content canvas { width:100%; height:auto; image-rendering:auto; }
+#puzzle-content canvas { width:100%; height:auto; aspect-ratio:auto; image-rendering:auto; }
 #puzzle-content button { margin:.6em .5em 0 0; }
 #puzzle-content input { font:inherit; color:#fff; background:#0d151f; border:1px solid #bc9e65; padding:.6em; max-width:100%; }

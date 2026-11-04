@@ -184,6 +184,16 @@ globalThis.RoomMaps = (() => {
   ]);
   const selected = new URLSearchParams(location.search).get('room');
   let currentMap = maps.find(room => room.id === selected) || maps[0];
+  let exitRevealed = false;
+  const originalLiving=maps[0], cover=originalLiving.objects.find(o=>o.id===originalLiving.exit.coverId);
+  const revealedLiving=Object.freeze(Object.assign(Object.create(Object.getPrototypeOf(originalLiving)),originalLiving,{
+    objects:Object.freeze(originalLiving.objects.filter(o=>o!==cover).map(o=>o.role==='escape-door'?Object.freeze({...o,parentId:null,interactionBounds:Object.freeze({x:420,y:130,width:56,height:10})}):o)),
+    obstacles:Object.freeze(originalLiving.obstacles.filter(o=>o!==cover.collision)),
+    exit:Object.freeze({...originalLiving.exit,locked:false})
+  }));
+  const revealedMaps=Object.freeze([revealedLiving,...maps.slice(1)]);
+  const effective=room=>exitRevealed&&room.id==='living'?revealedLiving:room;
+  function setExitRevealed(value){exitRevealed=!!value;}
   function setCurrentMap(id) {
     const next = maps.find(room => room.id === id);
     if (!next) return false;
@@ -221,7 +231,7 @@ globalThis.RoomMaps = (() => {
       ctx.fillText(assetState === 'error' ? '素材載入失敗，請確認圖片檔案後重新整理。' : '正在載入房間素材…', center.x, center.y);
       return;
     }
-    const room = currentMap;
+    const room = effective(currentMap);
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.beginPath();
@@ -268,5 +278,5 @@ globalThis.RoomMaps = (() => {
     ctx.fillText(room.name, center.x, 30);
   }
 
-  return { Map: RoomMap, maps, get currentMap() { return currentMap; }, setCurrentMap, draw };
+  return { Map: RoomMap, get maps(){return exitRevealed?revealedMaps:maps;}, get currentMap() { return effective(currentMap); }, setCurrentMap, setExitRevealed, draw };
 })();

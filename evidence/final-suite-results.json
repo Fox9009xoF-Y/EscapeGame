@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-05",
+  "node": {
+    "passed": 97,
+    "failed": 0
+  },
+  "pythonAssets": {
+    "passed": 1,
+    "failed": 0
+  },
+  "browser": {
+    "scripts": [
+      "verify-phase2.cjs",
+      "verify-phase3.cjs",
+      "verify-phase4.cjs",
+      "verify-phase5.cjs",
+      "verify-phase6.cjs",
+      "verify-refinement.cjs",
+      "verify-n1.cjs",
+      "verify-n1-boundaries.cjs",
+      "verify-n1-local.cjs",
+      "verify-n2.cjs",
+      "verify-story-controls.cjs",
+      "verify-puzzle-layout.cjs",
+      "verify-n3.cjs",
+      "verify-n4.cjs",
+      "verify-n5.cjs",
+      "verify-n6.cjs"
+    ],
+    "allCompleted": true,
+    "headless": true
+  },
+  "manualUserPlaytest": false,
+  "difficulty3to5MinutesVerified": false,
+  "verificationRows": 93,
+  "verifyFileUnchanged": true
+}

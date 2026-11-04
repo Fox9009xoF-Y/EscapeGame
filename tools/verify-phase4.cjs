@@ -17,7 +17,7 @@ const assert=require('node:assert/strict');
     await page.waitForFunction(()=>heroCalls.length>0);
     for(const [key,direction] of [['s','down'],['w','up'],['a','left'],['d','right']]){
       await page.evaluate(()=>{playerSession.player.x=640;playerSession.player.y=300;heroCalls=[];});
-      await page.keyboard.down(key);await page.waitForTimeout(400);await page.keyboard.up(key);
+      await page.keyboard.down(key);await page.waitForTimeout(50);await page.evaluate(()=>{heroCalls=[];});await page.waitForTimeout(350);await page.keyboard.up(key);
       await page.waitForTimeout(50);
       const result=await page.evaluate(()=>({direction:playerSession.player.direction,frame:playerSession.player.spriteFrame(),sources:[...new Set(heroCalls.map(c=>c.src.split('/').pop()))],frames:[...new Set(heroCalls.map(c=>c.sx))]}));
       assert.equal(result.direction,direction);assert.deepEqual(result.sources,[direction==='up'?'hero-back-walk.png':'hero-sprites.png']);assert.ok(result.frames.length>=2);
@@ -30,6 +30,7 @@ const assert=require('node:assert/strict');
       const box=RoomMaps.currentMap.objects.find(o=>o.role==='sofa').collision;
       p.moving=false;p.direction='down';p.x=box.x+box.width/2;
       ctx.fillStyle='#171b20';ctx.fillRect(0,0,1280,720);RoomMaps.draw(ctx,[]);
+      if(gameController)gameController.draw(ctx);
       const baseline=ctx.getImageData(0,0,1280,720).data;
       p.y=box.y+box.height-23;draw();const behind=ctx.getImageData(0,0,1280,720).data;
       p.y=box.y+box.height+7;draw();const front=ctx.getImageData(0,0,1280,720).data;

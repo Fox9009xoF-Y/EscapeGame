@@ -90,7 +90,7 @@ function update(deltaSeconds) {
     gameController.setVisible(true);
     if (gameController.blocking) { clearGameInput(); gameController.update(deltaSeconds); return; }
   }
-  if (playerSession) playerSession.update(deltaSeconds);
+  if (playerSession) { playerSession.setRoom(RoomMaps.currentMap); playerSession.update(deltaSeconds); }
   if (portalController) portalController.update(playerSession);
   if (interactionController) interactionController.update(playerSession);
   if (gameController) gameController.update(deltaSeconds);

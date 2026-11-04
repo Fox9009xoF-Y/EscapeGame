@@ -1,0 +1,17 @@
+{
+  "fullKeyboardEscape": true,
+  "coverRemoved": true,
+  "doorOpenedSeparately": true,
+  "walkOutsideRequired": true,
+  "alarmStopped": true,
+  "openedExitRetry": {
+    "room": "bedroom",
+    "covered": true,
+    "collision": true,
+    "doorOpen": false,
+    "attempts": 1
+  },
+  "finishedInputStable": true,
+  "endingLines": 16,
+  "errors": []
+}
