@@ -1,0 +1,4 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+function game(){const s=vm.createContext({});vm.runInContext(fs.readFileSync('puzzles.js','utf8'),s);return new s.PuzzleSystem.Game();}
+test('32種油燈亮滅只有L0/L2/L4成功，不要求操作順序',()=>{for(let mask=0;mask<32;mask++){const g=game();for(let i=0;i<5;i++)if(mask&(1<<i))g.toggleLamp(i);assert.equal(g.state.lampsSolved,mask===21,`mask=${mask}`);}const g=game();for(const i of[4,0,2])g.toggleLamp(i);assert.equal(g.state.lampsSolved,true);});
+test('遠端道具先生成，主動拾取後才入背包；改燈不取消且不能重領',()=>{const g=game();assert.equal(g.collectBookmark(),false);for(const i of[0,2,4])g.toggleLamp(i);assert.equal(g.state.rewardSpawned,true);assert.equal(g.state.inventory.length,0);g.toggleLamp(0);assert.equal(g.state.rewardSpawned,true);assert.equal(g.collectBookmark(),true);assert.equal(g.collectBookmark(),false);assert.deepEqual(Array.from(g.state.inventory),['knot_bookmark']);});
