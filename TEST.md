@@ -1029,3 +1029,7 @@
 # 本輪N3天象
 - 先提交3243d52的3項失敗測試後實作；N3範圍84項通過。Chrome verify-n3.cjs真實導航、22次燈光切換、第11格、錯誤拒絕、主動拾取與唯一鑰匙通過，evidence/n3-target.png/n3-key.png/n3-results.json。
 - 未宣稱使用者試玩，原VERIFY保持。後續整合後從頭重跑。
+
+
+# 本輪N4油燈
+- 先提交af3c7f4兩項失敗測試，再實作；86項通過。verify-n4.cjs實走全亮拒絕、正確組合、遠端生成/跨房/主動拾取及唯一道具，證據n4-paper/spawn/bookmark及n4-results.json。
