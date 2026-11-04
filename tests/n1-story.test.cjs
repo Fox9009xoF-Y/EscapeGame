@@ -71,15 +71,15 @@ test('點擊/空白一次一句，重複按鍵與快速連點不跳過多句', a
   c.release('pointer'); c.press('keyboard',200); assert.notEqual(c.snapshot().text,next);
 });
 
-test('按住三秒開始每500毫秒一句，鬆開任何輸入立即停止且不補算', async () => {
+test('按住1.5秒開始每250毫秒一句，鬆開任何輸入立即停止且不補算', async () => {
   const {c}=await ready(); c.press('keyboard',0); const initial=c.snapshot().text;
-  c.tick(2999); assert.equal(c.snapshot().text,initial);
-  c.tick(3000); const fast=c.snapshot().text; assert.notEqual(fast,initial);
-  c.tick(3499); assert.equal(c.snapshot().text,fast);
-  c.tick(3500); assert.notEqual(c.snapshot().text,fast);
+  c.tick(1499); assert.equal(c.snapshot().text,initial);
+  c.tick(1500); const fast=c.snapshot().text; assert.notEqual(fast,initial);
+  c.tick(1749); assert.equal(c.snapshot().text,fast);
+  c.tick(1750); assert.notEqual(c.snapshot().text,fast);
   c.release('pointer'); const stopped=c.snapshot().text; c.tick(9000); assert.equal(c.snapshot().text,stopped);
-  c.press('pointer',10000); const mouse=c.snapshot().text; c.tick(12999); assert.equal(c.snapshot().text,mouse);
-  c.tick(13000); assert.notEqual(c.snapshot().text,mouse);
+  c.press('pointer',10000); const mouse=c.snapshot().text; c.tick(11499); assert.equal(c.snapshot().text,mouse);
+  c.tick(11500); assert.notEqual(c.snapshot().text,mouse);
   c.cancelHold(); const blurred=c.snapshot().text; c.tick(30000); assert.equal(c.snapshot().text,blurred);
 });
 

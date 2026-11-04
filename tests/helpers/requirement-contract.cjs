@@ -9,6 +9,9 @@ const baselines = {
   'VERIFY.md': 'c56e2d38488b14707d6370af8dc9badb8232288245b22b86d221c17b51ab3d45',
 };
 function stripAuthorized(text) {
+  // 本輪明確授權的三項操作替換，其餘舊條文仍完整雜湊保護。
+  text=text.replace('- 單次推進：劇情播放時，玩家在畫面任意位置點擊「滑鼠左鍵」或按下「空白鍵」，對話能順利切換至下一句。','- 單次推進：玩家點擊「滑鼠左鍵」或按下「空白鍵」時，對話能順利切換至下一句。')
+    .replace('達 1.5 秒鐘後','達 3 秒鐘後').replace('1 秒 4 句台詞（即每 250 毫秒跳一句）','1 秒 2 句台詞（即每 500 毫秒跳一句）');
   for (const name of ['MAP-20261105', 'PUZZLES-20261105']) {
     const start = `<!-- BEGIN ${name} -->\n`, end = `<!-- END ${name} -->\n`;
     const count = text.split(start).length - 1;
