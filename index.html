@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Escape Game</title>
+  <title>密室逃脫之在杰難逃</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
   <script src="maps.js" defer></script>
@@ -11,6 +11,7 @@
   <script src="portals.js" defer></script>
   <script src="interactions.js" defer></script>
   <script src="door-labels.js" defer></script>
+  <script src="story.js" defer></script>
   <script src="main.js" defer></script>
 </head>
 <body>
@@ -19,6 +20,22 @@
     請使用支援 HTML5 Canvas 的瀏覽器開啟遊戲。
   </canvas>
   <svg id="door-labels" viewBox="0 0 1280 720" role="img" aria-label="門外目的房間指引"></svg>
+  <section id="story-layer" aria-label="劇情演出">
+    <img id="story-background" alt="當前章節背景" hidden>
+    <div id="story-cast" aria-label="本章人物" hidden></div>
+    <button id="story-pause" type="button" hidden>暫停</button>
+    <p id="story-asset-warning" role="alert" hidden></p>
+    <div id="story-dialogue" role="button" tabindex="0" aria-label="下一句對話" hidden>
+      <div id="story-chapter"></div>
+      <div id="story-speaker"></div>
+      <div id="story-text" aria-live="polite"></div>
+      <div id="story-guidance"></div>
+    </div>
+    <div id="story-status" role="status">
+      <p id="story-status-text">正在載入劇情…</p>
+      <button id="story-retry" type="button" hidden>重新載入</button>
+    </div>
+  </section>
   </div>
 </body>
 </html>

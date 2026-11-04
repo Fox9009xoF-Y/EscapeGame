@@ -55,7 +55,31 @@ const playerSession = typeof PlayerSystem !== 'undefined' && typeof RoomMaps !==
 const portalController = playerSession && typeof PortalSystem !== 'undefined' ? new PortalSystem.Controller(RoomMaps) : null;
 const interactionController = playerSession && typeof InteractionSystem !== 'undefined' ? new InteractionSystem.Controller(RoomMaps) : null;
 
+function clearGameInput() {
+  if (!playerSession) return;
+  playerSession.input.keys.clear();
+  playerSession.input.spaceDown = false;
+  playerSession.input.interactQueued = false;
+}
+const storyController = typeof StorySystem !== 'undefined' ? StorySystem.mount({
+  document, target: globalThis, clearInput: clearGameInput,
+  preview: ['living', 'bedroom', 'library'].includes(new URLSearchParams(location.search).get('room')),
+  onPuzzle() {
+    RoomMaps.setCurrentMap('living');
+    playerSession.setRoom(RoomMaps.currentMap);
+    playerSession.player.x = 640; playerSession.player.y = 360;
+    playerSession.player.moving = false;
+    if (interactionController) interactionController.message = null;
+    clearGameInput();
+  },
+}) : null;
+
 function update(deltaSeconds) {
+  if (storyController && storyController.mode !== 'puzzle') {
+    storyController.tick(performance.now());
+    clearGameInput();
+    return;
+  }
   if (playerSession) playerSession.update(deltaSeconds);
   if (portalController) portalController.update(playerSession);
   if (interactionController) interactionController.update(playerSession);
@@ -64,6 +88,7 @@ function update(deltaSeconds) {
 function draw() {
   ctx.fillStyle = '#171b20';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (storyController && storyController.mode !== 'puzzle') return;
   if (typeof RoomMaps !== 'undefined') {
     RoomMaps.draw(ctx, playerSession ? [playerSession.player] : []);
     if (typeof DoorLabels !== 'undefined') DoorLabels.render(document.getElementById('door-labels'), RoomMaps.currentMap);
