@@ -1,0 +1,4 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+function api(){const s=vm.createContext({});vm.runInContext(fs.readFileSync('puzzles.js','utf8'),s);return s.PuzzleSystem;}
+test('農曆月曆線索完整描述第11格五顆星方位、長光芒與左半月',()=>{const a=api(),c=a.calendarClue();assert.equal(c.day,23);assert.equal(c.month,8);assert.equal(c.sun,'長');assert.equal(c.azimuths.length,5);const initial=[0,.75,2.2,4.1,5.2];c.azimuths.forEach((angle,i)=>assert.ok(Math.abs(angle-((initial[i]*180/Math.PI+225)%360))<1e-8));assert.equal(a.stateAt(11).moon,3);});
+test('臥室紙條只領一份且保留其他機關進度',()=>{const g=new(api().Game)();g.state.cycle=7;assert.equal(g.collectNote(),true);assert.equal(g.collectNote(),false);assert.equal(g.state.inventory.filter(x=>x==='body_note').length,1);assert.equal(g.state.cycle,7);});
