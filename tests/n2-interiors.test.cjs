@@ -46,3 +46,11 @@ test('新增內裝只有調查回饋，不在N2解題或提前觸發警報/結�
  const s=load();for(const r of s.RoomMaps.maps)for(const o of r.objects.slice(2))assert.equal(typeof o.onInteract,'undefined');
  assert.equal(s.RoomMaps.maps[0].exit.locked,true);
 });
+
+test('床上抱枕與書櫃便條必須繪於父傢俱之後，出口門體仍位於書櫃後',()=>{
+ const s=load();for(const room of s.RoomMaps.maps)for(const o of room.objects.filter(o=>o.parentId)){
+  const parent=room.objects.find(p=>p.id===o.parentId);assert.ok(parent);
+  if(o.role==='escape-door')assert.ok(o.depth<parent.depth,'門在書櫃後');
+  else assert.ok(o.depth>parent.depth,o.id+' 不能被父傢俱蓋住');
+ }
+});
