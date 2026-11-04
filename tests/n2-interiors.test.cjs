@@ -3,8 +3,8 @@ function load(){class Image{set src(v){if(this.onload)this.onload();}}const s=vm
 const plain=x=>JSON.parse(JSON.stringify(x));
 const baseline=JSON.parse(fs.readFileSync('tests/fixtures/n2-map-baseline.json','utf8'));
 function valid(p,room){return room.innerVertices.every((a,i)=>{const b=room.innerVertices[(i+1)%room.innerVertices.length],l=Math.hypot(b.x-a.x,b.y-a.y),nx=-(b.y-a.y)/l,ny=(b.x-a.x)/l;return (p.x-a.x)*nx+(p.y-a.y)*ny>=Math.abs(nx)*8+Math.abs(ny)*6-1e-7;})&&!room.obstacles.some(b=>p.x+8>b.x&&p.x-8<b.x+b.width&&p.y+6>b.y&&p.y-6<b.y+b.height);}
-test('三房幾何、四門資料及原柱子/傢俱完整保留',()=>{
- const s=load();for(const [i,r] of s.RoomMaps.maps.entries())assert.deepEqual(plain({id:r.id,vertices:r.vertices,innerVertices:r.innerVertices,portals:r.portals,originalObjects:r.objects.slice(0,2).map(o=>({id:o.id,role:o.role,collision:o.collision}))}),baseline[i]);
+test('授權換裝後三房幾何與四門資料仍完整保留',()=>{
+ const s=load();for(const [i,r] of s.RoomMaps.maps.entries())assert.deepEqual(plain({id:r.id,vertices:r.vertices,innerVertices:r.innerVertices,portals:r.portals}),{id:baseline[i].id,vertices:baseline[i].vertices,innerVertices:baseline[i].innerVertices,portals:baseline[i].portals});
  assert.equal(new s.PlayerSystem.Player().speed,360);
 });
 test('客廳具天象牆、開關、地毯線索、書桌與左上書櫃後大門',()=>{

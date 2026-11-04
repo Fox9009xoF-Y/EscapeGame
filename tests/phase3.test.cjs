@@ -84,7 +84,9 @@ test('三房全部邊與角，含單次100秒位移，不穿牆或角落；使�
 
 test('斜牆碰撞保留切向位移，向內移動可離牆',()=>{
   const {Player,maps}=load();
-  for(const room of maps.slice(1)) {
+  for(const map of maps.slice(1)) {
+    // 牆邊現在有書櫃；隔離驗證幾何滑動，完整場景碰撞仍由48方向測試覆蓋。
+    const room={...map,obstacles:[]};
     const v=room.innerVertices;
     const i=v.findIndex((a,i)=>Math.abs(v[(i+1)%v.length].x-a.x)>1 && Math.abs(v[(i+1)%v.length].y-a.y)>1);
     const a=v[i],b=v[(i+1)%v.length],len=Math.hypot(b.x-a.x,b.y-a.y),tx=(b.x-a.x)/len,ty=(b.y-a.y)/len,nx=-ty,ny=tx;
@@ -99,7 +101,10 @@ test('斜牆碰撞保留切向位移，向內移動可離牆',()=>{
 
 test('三房可見障礙物以掃掠碰撞阻擋四方向高速穿透並可貼邊滑動',()=>{
   const {Player,maps}=load();
-  for(const room of maps) {
+  for(const map of maps) {
+    // 使用真實障礙尺寸，在獨立空間驗證四面掃掠；不從已封到外牆的牆後出生。
+    const b=map.obstacles[0],margin=100;
+    const room={obstacles:[b],innerVertices:[{x:b.x-margin,y:b.y-margin},{x:b.x+b.width+margin,y:b.y-margin},{x:b.x+b.width+margin,y:b.y+b.height+margin},{x:b.x-margin,y:b.y+b.height+margin}]};
     assert.ok(room.obstacles.length>0);
     const box=room.obstacles[0],cx=box.x+box.width/2,cy=box.y+box.height/2;
     for(const [x,y,dx,dy] of [[box.x-40,cy,2000,0],[box.x+box.width+40,cy,-2000,0],[cx,box.y-40,0,2000],[cx,box.y+box.height+40,0,-2000]]) {
