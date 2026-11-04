@@ -13,7 +13,7 @@
     6
   ],
   "bounceMidpoint": {
-    "matrix": "matrix(1, 0, 0, 1, 0, -1.6868)",
+    "matrix": "matrix(1, 0, 0, 1, 0, -1.38375)",
     "count": 1
   },
   "visibilityEventSimulated": true,

@@ -14,5 +14,5 @@ exports.solveAll=async page=>{
  await exports.room(page,'bedroom');for(const i of[0,2,4])await exports.use(page,'bedroom-lamp-'+i);
  await exports.room(page,'library');await exports.use(page,'library-reward-marker');
  await page.getByLabel('文字謎題答案').fill('纏綿');await page.getByRole('button',{name:'確認答案',exact:true}).click();await exports.close(page);
- await exports.room(page,'bedroom');await exports.use(page,'bedroom-pillow');
+ await exports.room(page,'bedroom');await exports.use(page,'bedroom-pillow');if(await page.evaluate(()=>gameController.modal?.kind==='pillow-description'))await page.getByRole('button',{name:'繼續調查',exact:true}).click();
 };

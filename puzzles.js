@@ -1,9 +1,11 @@
 'use strict';
 globalThis.PuzzleSystem=(()=>{
+ function calendarClue(){return {month:8,day:23,sun:'長',azimuths:[0,.75,2.2,4.1,5.2].map(a=>(a*180/Math.PI+225)%360)};}
  const roomIds=['living','bedroom','library'];
  function stateAt(n){n=((n%24)+24)%24;return {sun:n%3,moon:n%4,angle:(n%8)*Math.PI/4,target:n===11};}
  class Game{
   constructor(){this.state={phase:'explore',lights:{living:true,bedroom:true,library:true},cycle:0,sunTaken:false,wallSeen:false,inventory:[],lampOn:[false,false,false,false,false],lampsSolved:false,rewardSpawned:false,rewardCollected:false,ambientLamps:{},wordSolved:false,exitRevealed:false,doorOpen:false,alarm:false};this.attempts=0;}
+  collectNote(){if(this.state.inventory.includes('body_note'))return false;this.state.inventory.push('body_note');return true;}
   toggleLight(room){if(!roomIds.includes(room)||this.state.phase!=='explore')return false;const s=this.state;s.lights[room]=!s.lights[room];if(room==='living'&&s.lights[room])s.cycle=(s.cycle+1)%24;return true;}
   visitWall(){const first=!this.state.wallSeen;this.state.wallSeen=true;return first?'原來傑哥也會觀星啊。':'';}
   touchSun(){const s=this.state;if(s.sunTaken||!stateAt(s.cycle).target)return false;s.sunTaken=true;s.inventory.push('sun_key');return true;}
@@ -37,11 +39,12 @@ globalThis.PuzzleSystem=(()=>{
   show(title,text,kind='text'){this.modal={kind,title,text};this.panel.hidden=false;this.title.textContent=title;this.body.replaceChildren();if(text)this.body.append(this.element('p',text));this.clearInput();}
   close(){if(this.modal?.kind==='chase-intro')return;this.modal=null;this.panel.hidden=true;this.clearInput();}
   toast(text){this.notice.textContent=text;this.toastUntil=this.target.performance.now()+3000;this.refresh();}
-  refresh(){const names={sun_key:'太陽鑰匙',knot_bookmark:'繩結書籤'};this.inventory.textContent='道具：'+(this.game.state.inventory.map(id=>names[id]||id).join('、')||'無');if(this.game.state.rewardCollected){const b=this.element('button','看書籤');b.type='button';b.onclick=()=>this.bookmark();this.inventory.append(b);}}
+  refresh(){const names={sun_key:'太陽鑰匙',knot_bookmark:'繩結書籤',body_note:'掉落的紙條'};this.inventory.textContent='道具：'+(this.game.state.inventory.map(id=>names[id]||id).join('、')||'無');if(this.game.state.rewardCollected){const b=this.element('button','看書籤');b.type='button';b.onclick=()=>this.bookmark();this.inventory.append(b);}if(this.game.state.inventory.includes('body_note')){const b=this.element('button','看紙條');b.type='button';b.onclick=()=>{if(this.game.state.phase==='explore')this.notePanel();else this.toast('現在只能先逃出去！');};this.inventory.append(b);}}
   setVisible(visible){if(this.visible===visible)return;this.visible=visible;this.layer.hidden=!visible;if(!visible)this.close();else this.refresh();}
   celestialPanel(target=false,quote=''){
-   this.show(target?'地毯下的天象圖':'天象牆',target?'明明星空很亮，但環境怎麼好像有點陰暗。':quote?("彬彬：「"+quote+'」'):'牆上有太陽、月亮與星群。',target?'target':'celestial');
-   const canvas=this.element('canvas');canvas.width=480;canvas.height=200;canvas.setAttribute('aria-label',target?'目標天象圖':'目前牆上天象');this.body.append(canvas);drawCelestial(canvas.getContext('2d'),target?11:this.game.state.cycle,0,0,480,200,!target&&this.game.state.sunTaken);
+   if(target){this.calendarPanel();return;}
+   this.show('天象牆｜杰哥原來也有這個興趣?',quote?'彬彬：「'+quote+'」\n彬彬的心裡話：「明明星空很亮，但環境怎麼好像有點陰暗。」':'牆上有太陽、月亮與星群。','celestial');
+   const canvas=this.element('canvas');canvas.width=480;canvas.height=200;canvas.setAttribute('aria-label','目前牆上天象');this.body.append(canvas);drawCelestial(canvas.getContext('2d'),this.game.state.cycle,0,0,480,200,this.game.state.sunTaken);
    if(!target)this.button('觸碰太陽',()=>{const taken=this.game.touchSun();this.celestialPanel(false);this.body.append(this.element('p',taken?'太陽鬆開了，取下的是一把光芒形狀的鑰匙。':this.game.state.sunTaken?'太陽鑰匙已經收好了。':'太陽還卡在牆上，天象似乎尚未相合。'));this.refresh();});
   }
   interact(object){
@@ -58,22 +61,35 @@ globalThis.PuzzleSystem=(()=>{
    }
    if(object.role==='reward-marker'){if(this.game.collectBookmark()){this.toast('拿到了繩結書籤。');this.bookmark();}else if(this.game.state.rewardCollected)this.bookmark();else this.toast('中央刻痕裡還空著。');return true;}
    if(object.role==='word-clue'){this.wordPanel();return true;}
-   if(object.role==='pillow'){const p=this.session.player;if(this.game.beginChase({room:this.maps.currentMap.id,x:p.x,y:p.y,direction:p.direction}))this.chaseIntro();else this.toast(!this.game.state.wordSolved?'先看看書櫃中的便條，想清楚那個詞。':'還有機關或道具沒處理完。先調查其他地方，再回來看抱枕。');return true;}
+   if(object.id==='bedroom-low-table'){this.show('矮桌上的紙條','祝你今晚好眠，同床共夢');return true;}
+   if(object.id==='bedroom-lower-bookshelf'){if(!this.game.state.inventory.includes('body_note')){this.show('臥室下方書櫃','靠牆的書櫃塞著一些雜物','note-discovery');this.button('下一句',()=>{this.show('彬彬','好像有有什麼掉出來了','note-found');this.game.collectNote();this.refresh();this.button('查看紙條',()=>this.notePanel());});}else this.show('臥室下方書櫃','靠牆的書櫃塞著一些雜物');return true;}
+   if(object.role==='pillow'){if(!this.game.state.pillowSeen){this.game.state.pillowSeen=true;this.show('杰哥的抱枕','一個印著杰哥的抱枕，這什麼興趣','pillow-description');this.button('繼續調查',()=>{this.close();this.touchPillow();});}else this.touchPillow();return true;}
+
    return false;
   }
+  touchPillow(){const p=this.session.player;if(this.game.beginChase({room:this.maps.currentMap.id,x:p.x,y:p.y,direction:p.direction}))this.chaseIntro();else this.toast(!this.game.state.wordSolved?'先看看紙條，想清楚那個詞。':'還有機關或道具沒處理完。先調查其他地方，再回來看抱枕。');}
+  notePanel(){this.show('掉落的紙條','以軀體為題，以藤蔓為解，其心為何?','body-note');}
+  calendarPanel(){
+   const c=calendarClue();this.show('地毯下的月曆','','target');
+   const canvas=this.element('canvas');canvas.width=480;canvas.height=200;canvas.setAttribute('aria-label','八月月曆，廿三日被圈起');this.body.append(canvas);const ctx=canvas.getContext('2d');ctx.fillStyle='#dfd0aa';ctx.fillRect(0,0,480,200);ctx.fillStyle='#493c2c';ctx.font='22px sans-serif';ctx.fillText('農曆 八月',22,30);ctx.font='16px sans-serif';for(let d=1;d<=30;d++){const x=28+((d-1)%7)*65,y=62+Math.floor((d-1)/7)*29;ctx.fillText(String(d),x,y);if(d===23){ctx.strokeStyle='#9b3836';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+9,y-5,14,0,Math.PI*2);ctx.stroke();}}
+   this.body.append(this.element('p','農曆八月廿三'));
+   this.body.append(this.element('p','今日幸運方位（北為0°，順時針）：'+c.azimuths.map(v=>v.toFixed(2)+'°').join('、')));
+   this.body.append(this.element('p','今日幸運光芒：'+c.sun));
+  }
+  vinePicture(){const c=this.element('canvas');c.width=480;c.height=130;c.setAttribute('aria-label','藤蔓交纏心形石頭的意象');this.body.append(c);const x=c.getContext('2d');x.fillStyle='#101b25';x.fillRect(0,0,480,130);x.fillStyle='#9d6970';x.beginPath();x.moveTo(240,110);x.bezierCurveTo(120,45,195,-10,240,36);x.bezierCurveTo(285,-10,360,45,240,110);x.fill();for(let j=0;j<2;j++){x.strokeStyle=j?'#b4bd7c':'#659477';x.lineWidth=5;x.beginPath();for(let i=0;i<=160;i++){const px=100+i*1.8,py=65+Math.sin(i*.11+j*Math.PI)*28;if(!i)x.moveTo(px,py);else x.lineTo(px,py);}x.stroke();}}
   bookmark(){if(this.game.state.phase!=='explore'){this.toast('現在只能先逃出去！');return;}this.wordPanel('繩結書籤');}
   wordPanel(title='書櫃裡的文字謎題'){
-   this.show(title,'以軀體為題，以藤蔓作答，其心為何？','word');const label=this.element('label','其心為何（兩個字）'),input=this.element('input');input.type='text';input.maxLength=24;input.setAttribute('aria-label','文字謎題答案');label.append(input);this.body.append(label);const feedback=this.element('p');this.body.append(feedback);
+   this.show(title,'請給我你的心臟，重量兩個字','word');this.vinePicture();const label=this.element('label','其心為何（兩個字）'),input=this.element('input');input.type='text';input.maxLength=24;input.setAttribute('aria-label','文字謎題答案');label.append(input);this.body.append(label);const feedback=this.element('p');this.body.append(feedback);
    const solve=()=>{if(this.game.solveWord(input.value)){this.show('彬彬的心裡話','纏綿...?該不會是要我和杰哥纏綿吧?','word-solved');this.body.append(this.element('p','想出了「纏綿」，還需要到房間裡實際調查。'));}else feedback.textContent='再想想軀體與藤蔓相互纏繞、連綿的樣子。';};this.button('確認答案',solve);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();solve();}});input.focus();
   }
   chaseIntro(){this.pursuit=null;this.stopAlarm();this.show('彬彬','好暗，得趕快逃出去','chase-intro');this.body.append(this.element('p','警報響起了。帶著鑰匙，往客廳的書櫃後大門逃！'));this.button(this.game.state.phase==='retry'?'重新挑戰':'趕快逃！',()=>{if(!this.game.startChase())return;this.modal=null;this.panel.hidden=true;this.clearInput();const room=this.maps.currentMap,point=ChaseSystem.spawn(room,this.session.player);if(point)this.pursuit=new ChaseSystem.Pursuit({maps:this.maps,start:{room:room.id,...point},playerSpeed:this.session.player.speed});this.alarmClock=0;this.toast('警報響起！杰哥可能從牆邊出現。');}).focus();this.refresh();}
   stopAlarm(){if(this.alarmOscillator){try{this.alarmOscillator.stop();}catch{}this.alarmOscillator=null;}}
   beep(){if(this.muted)return;try{const Audio=this.target.AudioContext||this.target.webkitAudioContext;if(!Audio)return;this.audio||=new Audio();this.audio.resume().catch(()=>{});const osc=this.audio.createOscillator(),gain=this.audio.createGain();osc.frequency.value=620;gain.gain.value=.035;osc.connect(gain);gain.connect(this.audio.destination);osc.start();osc.stop(this.audio.currentTime+.09);this.alarmOscillator=osc;osc.onended=()=>{osc.disconnect();gain.disconnect();if(this.alarmOscillator===osc)this.alarmOscillator=null;};}catch{/* 可見警報仍持續顯示。 */}}
   roomPaper(){
-   this.show('抽屜裡的房間圖','以從客廳進來的入口為基準，對照臥室的燈位。實心代表亮、空心代表暗；六角形中央有個記號。','room-paper');
+   this.show('','','room-paper');
    const canvas=this.element('canvas');canvas.width=600;canvas.height=280;canvas.setAttribute('aria-label','同一張紙上的三房形狀、入口方向及五盞燈目標');this.body.append(canvas);const ctx=canvas.getContext('2d');ctx.fillStyle='#d8c7a0';ctx.fillRect(0,0,600,280);ctx.textAlign='center';ctx.font='17px sans-serif';
    for(const [index,room]of this.maps.maps.entries()){
-    const cx=105+195*index,cy=125,scale=.25,to=p=>({x:cx+(p.x-640)*scale,y:cy+(p.y-360)*scale});ctx.strokeStyle='#483e32';ctx.lineWidth=3;ctx.beginPath();room.vertices.forEach((p,i)=>{const q=to(p);if(!i)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);});ctx.closePath();ctx.stroke();ctx.fillStyle='#483e32';ctx.fillText(room.name,cx,245);
+    const cx=105+195*index,cy=125,scale=.25,to=p=>({x:cx+(p.x-640)*scale,y:cy+(p.y-360)*scale});ctx.strokeStyle='#483e32';ctx.lineWidth=3;ctx.beginPath();room.vertices.forEach((p,i)=>{const q=to(p);if(!i)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);});ctx.closePath();ctx.stroke();ctx.fillStyle='#483e32';
     if(room.id==='bedroom'){
      for(const lamp of room.objects.filter(o=>o.role==='oil-lamp')){const b=lamp.visualBounds,q=to({x:b.x+b.width/2,y:b.y+b.height/2});ctx.beginPath();ctx.arc(q.x,q.y,5,0,Math.PI*2);ctx.stroke();if([0,2,4].includes(lamp.lampIndex)){ctx.fillStyle='#8a4f25';ctx.fill();}}
      const door=room.portals.find(d=>d.target==='living'),p=to(door.center);ctx.fillStyle='#a04436';ctx.beginPath();ctx.moveTo(p.x-5,p.y+7);ctx.lineTo(p.x+8,p.y+3);ctx.lineTo(p.x+2,p.y-7);ctx.closePath();ctx.fill();ctx.fillText('入口',p.x-14,p.y+26);
@@ -81,7 +97,7 @@ globalThis.PuzzleSystem=(()=>{
     if(room.id==='library'){ctx.fillStyle='#8a4f25';ctx.fillRect(cx-5,cy-5,10,10);}
    }
   }
-  hint(){if(this.game.state.phase!=='explore'){this.toast('快往客廳左上角大門逃！');return;}this.hints++;let hints=['留意房裡可以調查的物件，地毯下也可能有線索。','日、月、星群各有自己的規律，對照紙上的天象。','日、月、星群週期為3、4、8，完整明暗循環11次後，再主動碰觸太陽。'];if(this.game.state.sunTaken&&!this.game.state.lampsSolved)hints=['書桌抽屜裡的圖形與三個房間相同。','先對準客廳入口，再看五個角落的燈位；多亮也不行。','由客廳入口附近起順時針，亮、暗、亮、暗、亮。'];else if(this.game.state.lampsSolved&&!this.game.state.rewardCollected)hints=['到六角形藏書房中央調查刻痕。'];if(this.game.state.rewardCollected)hints=['書籤與書櫃便條都在問軀體和藤蔓相連的意象。','其心是纏綿。解出後還需要實際調查床上的杰哥抱枕。'];this.show('提示 '+Math.min(this.hints,3),hints[Math.min(this.hints-1,hints.length-1)]);}
+  hint(){if(this.game.state.phase!=='explore'){this.toast('快往客廳左上角大門逃！');return;}this.hints++;let hints=['留意房裡可以調查的物件，地毯下也可能有線索。','日、月、星群各有自己的規律，對照紙上的天象。','日、月、星群週期為3、4、8，完整明暗循環11次後，再主動碰觸太陽。'];if(this.game.state.sunTaken&&!this.game.state.lampsSolved)hints=['書桌抽屜裡的圖形與三個房間相同。','先對準客廳入口，再看五個角落的燈位；多亮也不行。','由客廳入口附近起順時針，亮、暗、亮、暗、亮。'];else if(this.game.state.lampsSolved&&!this.game.state.rewardCollected)hints=['到六角形藏書房中央調查刻痕。'];if(this.game.state.rewardCollected)hints=['臥室掉落的紙條與藏書房的藤蔓圖像，指向相連的意象。','其心是纏綿。解出後還需要實際調查床上的杰哥抱枕。'];this.show('提示 '+Math.min(this.hints,3),hints[Math.min(this.hints-1,hints.length-1)]);}
   update(dt){
    if(this.game.state.phase==='chase'){
     if(exitReady(this.maps.currentMap,this.session.player,this.session.input.direction())&&this.game.finishExit()){this.stopAlarm();this.pursuit=null;this.clearInput();this.onExit();return;}
@@ -98,5 +114,5 @@ globalThis.PuzzleSystem=(()=>{
   get entities(){return this.pursuit&&this.game.state.phase==='chase'&&this.pursuit.delay<=0&&this.pursuit.room===this.maps.currentMap.id?[this.pursuit.actor]:[];}
  }
  function mount(options){return new Controller(options);}
- return {Game,Controller,stateAt,drawCelestial,exitReady,mount};
+ return {Game,Controller,stateAt,drawCelestial,calendarClue,exitReady,mount};
 })();
