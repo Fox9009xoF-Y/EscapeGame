@@ -74,24 +74,36 @@ const storyController = typeof StorySystem !== 'undefined' ? StorySystem.mount({
   },
 }) : null;
 
+// ?room= 保留純場景預覽，完整遊戲從預設首頁開始。
+const gameController = typeof PuzzleSystem !== 'undefined' && !['living','bedroom','library'].includes(new URLSearchParams(location.search).get('room'))
+  ? PuzzleSystem.mount({document, target:globalThis, maps:RoomMaps, session:playerSession, portals:portalController, clearInput:clearGameInput,
+      onExit:()=>storyController.completeEscape(true)}) : null;
+if (gameController && interactionController) interactionController.onInteract = object => gameController.interact(object);
+
 function update(deltaSeconds) {
   if (storyController && storyController.mode !== 'puzzle') {
     storyController.tick(performance.now());
     clearGameInput();
     return;
   }
+  if (gameController) {
+    gameController.setVisible(true);
+    if (gameController.blocking) { clearGameInput(); gameController.update(deltaSeconds); return; }
+  }
   if (playerSession) playerSession.update(deltaSeconds);
   if (portalController) portalController.update(playerSession);
   if (interactionController) interactionController.update(playerSession);
+  if (gameController) gameController.update(deltaSeconds);
 }
 
 function draw() {
   ctx.fillStyle = '#171b20';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  if (storyController && storyController.mode !== 'puzzle') return;
+  if (storyController && storyController.mode !== 'puzzle') { if (gameController) gameController.setVisible(false); return; }
   if (typeof RoomMaps !== 'undefined') {
     RoomMaps.draw(ctx, playerSession ? [playerSession.player] : []);
     if (typeof DoorLabels !== 'undefined') DoorLabels.render(document.getElementById('door-labels'), RoomMaps.currentMap);
+    if (gameController) gameController.draw(ctx);
     if (interactionController) interactionController.draw(ctx);
     return;
   }

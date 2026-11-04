@@ -31,6 +31,7 @@ globalThis.InteractionSystem = (() => {
       if (this.message) { this.message = null; return true; }
       const object = findTarget(session.player, this.maps.currentMap);
       if (!object) return false;
+      if (this.onInteract && this.onInteract(object)) return true;
       this.message = { id:object.id, title:object.title, text:object.text };
       return true;
     }
