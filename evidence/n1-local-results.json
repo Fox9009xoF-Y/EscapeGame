@@ -1,0 +1,13 @@
+{
+  "protocol": "file:",
+  "initialPicker": true,
+  "emptySelection": true,
+  "missingFileRetry": true,
+  "openingLines": 53,
+  "endingLines": 16,
+  "reloadRequiresSelection": true,
+  "updatedText": true,
+  "textRequests": [],
+  "errors": [],
+  "headless": true
+}

@@ -33,6 +33,11 @@
     </div>
     <div id="story-status" role="status">
       <p id="story-status-text">正在載入劇情…</p>
+      <div id="story-local-picker" hidden>
+        <label for="story-local-files">選擇此專案內的 story1.txt 與 story2.txt（可按住 Ctrl 同時選取）</label>
+        <input id="story-local-files" type="file" multiple accept=".txt,text/plain">
+        <p>直接開啟網頁時，需先選取兩份劇本。修改劇本後重新開啟並重選，即可讀取新內容。</p>
+      </div>
       <button id="story-retry" type="button" hidden>重新載入</button>
     </div>
   </section>

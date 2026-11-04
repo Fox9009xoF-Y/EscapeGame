@@ -51,6 +51,19 @@ globalThis.StorySystem = (() => {
         this.mode='error';this.error=`劇情載入失敗：${error.message}。請確認檔案後重試。`;this.notify();
       }
     }
+    loadFiles(files) {
+      const selected = Array.from(files);
+      // 與 HTTP 共用解析、錯誤處理及競態保護，只替換讀取來源。
+      return this.load(async path => {
+        for (const name of ['story1.txt', 'story2.txt']) {
+          if (selected.filter(file => file.name.toLowerCase() === name).length !== 1) {
+            throw Error('請各選取一份 story1.txt 與 story2.txt');
+          }
+        }
+        const file = selected.find(file => file.name.toLowerCase() === path);
+        return { ok: true, text: () => file.text() };
+      });
+    }
     advance(now) {
       if(this.paused||!['opening','ending'].includes(this.mode)||now-this.lastAdvance<160) return false;
       this.lastAdvance=now;this.lineIndex++;
@@ -87,6 +100,8 @@ globalThis.StorySystem = (() => {
     const get=id=>document.getElementById(id),layer=get('story-layer'),background=get('story-background'),cast=get('story-cast');
     const dialogue=get('story-dialogue'),chapterLabel=get('story-chapter'),speaker=get('story-speaker'),text=get('story-text');
     const pause=get('story-pause'),status=get('story-status'),statusText=get('story-status-text'),retry=get('story-retry');
+    const localMode = target.location.protocol === 'file:';
+    const localPicker = get('story-local-picker'), localFiles = get('story-local-files');
     let chapterKey='',lastRevision=-1,lastLine='';
     const assetErrors=new Set(),assetWarning=get('story-asset-warning');
     const showErrors=()=>{assetWarning.textContent=assetErrors.size?`圖片載入失敗：${[...assetErrors].join('、')}，請確認圖檔後重新整理。`:'';assetWarning.hidden=assetErrors.size===0;};
@@ -96,8 +111,9 @@ globalThis.StorySystem = (() => {
       if(lastRevision===state.revision)return;lastRevision=state.revision;
       const active=['opening','ending'].includes(state.mode);
       layer.hidden=state.mode==='puzzle';dialogue.hidden=!active;pause.hidden=!active;background.hidden=!active;cast.hidden=!active;
-      status.hidden=active||state.mode==='puzzle';retry.hidden=state.mode!=='error';
-      statusText.textContent=state.mode==='finished'?'全劇終\n感謝遊玩《密室逃脫之在杰難逃》':state.mode==='error'?state.text:'正在載入劇情…';
+      status.hidden=active||state.mode==='puzzle';retry.hidden=localMode||state.mode!=='error';
+      localPicker.hidden = !localMode || !['awaiting-files', 'error'].includes(state.mode);
+      statusText.textContent=state.mode==='finished'?'全劇終\n感謝遊玩《密室逃脫之在杰難逃》':state.mode==='error'?state.text:state.mode==='awaiting-files'?'請選取劇本，開始遊戲':'正在載入劇情…';
       get('door-labels').hidden=state.mode!=='puzzle';
       pause.textContent=state.paused?'繼續':'暫停';pause.setAttribute('aria-pressed',String(state.paused));
       dialogue.setAttribute('aria-disabled',String(state.paused));
@@ -141,7 +157,13 @@ globalThis.StorySystem = (() => {
     document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
     pause.addEventListener('click',()=>{controller.setPaused(!controller.paused);clearInput();});
     retry.addEventListener('click',()=>controller.load(target.fetch.bind(target)));
+    localFiles.addEventListener('change', () => {
+      const files = Array.from(localFiles.files);
+      localFiles.value = '';
+      if (files.length) controller.loadFiles(files);
+    });
     if(preview) {controller.mode='puzzle';controller.notify();}
+    else if(localMode) {controller.mode='awaiting-files';controller.notify();}
     else controller.load(target.fetch.bind(target));
     return controller;
   }

@@ -52,3 +52,7 @@ canvas {
 #story-pause { position: absolute; top: 3%; right: 3%; z-index: 2; }
 #story-status { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8%; text-align: center; font-size: clamp(16px, 2.5cqw, 32px); white-space: pre-line; }
 #story-asset-warning { position: absolute; top: 2%; left: 3%; right: 20%; background: #3b1f22; padding: .5em; z-index: 2; font-size: clamp(8px, 1.1cqw, 14px); }
+#story-local-picker { max-width: 90%; font-size: clamp(12px, 1.5cqw, 20px); line-height: 1.7; }
+#story-local-picker label { display: block; }
+#story-local-files { display: block; margin: 1em auto; max-width: 100%; font: inherit; }
+#story-local-files::file-selector-button { font: inherit; color: #f6e7cb; background: #18222d; border: 1px solid #b49b69; border-radius: 4px; padding: .5em 1em; cursor: pointer; }
