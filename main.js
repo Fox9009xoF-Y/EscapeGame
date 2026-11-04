@@ -101,7 +101,7 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   if (storyController && storyController.mode !== 'puzzle') { if (gameController) gameController.setVisible(false); return; }
   if (typeof RoomMaps !== 'undefined') {
-    RoomMaps.draw(ctx, playerSession ? [playerSession.player] : []);
+    RoomMaps.draw(ctx, playerSession ? [playerSession.player, ...(gameController ? gameController.entities : [])] : []);
     if (typeof DoorLabels !== 'undefined') DoorLabels.render(document.getElementById('door-labels'), RoomMaps.currentMap);
     if (gameController) gameController.draw(ctx);
     if (interactionController) interactionController.draw(ctx);

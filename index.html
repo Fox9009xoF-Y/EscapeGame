@@ -13,6 +13,7 @@
   <script src="door-labels.js" defer></script>
   <script src="story.js" defer></script>
   <script src="puzzles.js" defer></script>
+  <script src="chase.js" defer></script>
   <script src="main.js" defer></script>
 </head>
 <body>
@@ -43,7 +44,8 @@
     </div>
   </section>
   <section id="puzzle-layer" hidden aria-label="解謎操作">
-    <div id="puzzle-hud"><span>彬彬的逃脫</span><span id="puzzle-inventory">道具：無</span><button id="puzzle-hint" type="button">提示</button></div>
+    <div id="puzzle-hud"><span>彬彬的逃脫</span><span id="puzzle-inventory">道具：無</span><button id="puzzle-hint" type="button">提示</button><button id="puzzle-mute" type="button">靜音</button></div>
+    <p id="puzzle-alarm" hidden role="status">警報響起！</p>
     <p id="puzzle-notice" role="status"></p>
     <div id="puzzle-modal" hidden role="dialog" aria-modal="true" aria-labelledby="puzzle-title">
       <div class="puzzle-card"><header><h2 id="puzzle-title"></h2><button id="puzzle-close" type="button">關閉</button></header><div id="puzzle-content"></div></div>

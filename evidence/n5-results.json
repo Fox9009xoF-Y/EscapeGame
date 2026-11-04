@@ -1,0 +1,12 @@
+{
+  "mask": {
+    "leaks": 0,
+    "inside": 396,
+    "labels": "hidden",
+    "speed": 216
+  },
+  "retries": 2,
+  "checkpointRestored": true,
+  "keyboardStart": true,
+  "errors": []
+}

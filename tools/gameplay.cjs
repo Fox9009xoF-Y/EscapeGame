@@ -7,3 +7,12 @@ exports.room=async(page,target)=>{for(let i=0;i<3&&await page.evaluate(()=>RoomM
  }assert.equal(await page.evaluate(()=>RoomMaps.currentMap.id),target);};
 exports.use=async(page,id)=>{await navigate(page,{id});await page.keyboard.press('Space');await page.waitForTimeout(50);};
 exports.close=async page=>{if(await page.locator('#puzzle-modal').isVisible())await page.locator('#puzzle-close').click();};
+exports.solveAll=async page=>{
+ await exports.use(page,'living-switch');await exports.use(page,'living-switch');
+ for(let i=1;i<11;i++){await page.keyboard.press('Space');await page.waitForTimeout(35);await page.keyboard.press('Space');await page.waitForTimeout(35);}
+ await exports.use(page,'living-celestial');await page.getByRole('button',{name:'觸碰太陽',exact:true}).click();await exports.close(page);
+ await exports.room(page,'bedroom');for(const i of[0,2,4])await exports.use(page,'bedroom-lamp-'+i);
+ await exports.room(page,'library');await exports.use(page,'library-reward-marker');
+ await page.getByLabel('文字謎題答案').fill('纏綿');await page.getByRole('button',{name:'確認答案',exact:true}).click();await exports.close(page);
+ await exports.room(page,'bedroom');await exports.use(page,'bedroom-pillow');
+};

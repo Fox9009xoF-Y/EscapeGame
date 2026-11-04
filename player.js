@@ -25,7 +25,7 @@ globalThis.PlayerSystem = (() => {
       this.interactQueued = false;
       const clear = () => { this.keys.clear(); this.spaceDown = false; this.interactQueued = false; };
       target.addEventListener('keydown', event => {
-        if (event.target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName)) return;
+        if (event.target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(event.target?.tagName)) return;
         if (event.code === 'Space') {
           event.preventDefault();
           if (!this.spaceDown && !event.repeat) this.interactQueued = true;
