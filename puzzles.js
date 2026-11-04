@@ -1,6 +1,7 @@
 'use strict';
 globalThis.PuzzleSystem=(()=>{
  function calendarClue(){return {month:8,day:23,sun:'長',azimuths:[0,.75,2.2,4.1,5.2].map(a=>(a*180/Math.PI+225)%360)};}
+ function paperDoors(room){const result=room.portals.map(d=>({center:d.center,normal:d.normal}));if(room.exit){const b=room.objects.find(o=>o.role==='escape-door').visualBounds;result.push({center:{x:b.x+b.width/2,y:b.y+b.height/2},normal:{x:0,y:1}});}return result;}
  const roomIds=['living','bedroom','library'];
  function stateAt(n){n=((n%24)+24)%24;return {sun:n%3,moon:n%4,angle:(n%8)*Math.PI/4,target:n===11};}
  class Game{
@@ -11,7 +12,7 @@ globalThis.PuzzleSystem=(()=>{
   touchSun(){const s=this.state;if(s.sunTaken||!stateAt(s.cycle).target)return false;s.sunTaken=true;s.inventory.push('sun_key');return true;}
   toggleLamp(index){const s=this.state;if(s.phase!=='explore'||!Number.isInteger(index)||index<0||index>=5)return false;s.lampOn[index]=!s.lampOn[index];if(s.lampOn.every((on,i)=>on===[true,false,true,false,true][i])){s.lampsSolved=true;s.rewardSpawned=true;}return true;}
   collectBookmark(){const s=this.state;if(!s.rewardSpawned||s.rewardCollected)return false;s.rewardCollected=true;s.inventory.push('knot_bookmark');return true;}
-  solveWord(text){const answer=String(text).replace(/[\s，。！？?!,.]/g,'');if(!['纏綿','缠绵','纏繞','交纏'].includes(answer))return false;this.state.wordSolved=true;return true;}
+  solveWord(text){const answer=String(text).replace(/[\s，。！？?!,.]/g,'');if(!['纏綿','缠绵','交纏'].includes(answer))return false;this.state.wordSolved=true;return true;}
   beginChase(player){const s=this.state;if(s.phase!=='explore'||!s.wordSolved||!s.sunTaken||!s.lampsSolved||!s.rewardCollected||!s.inventory.includes('sun_key'))return false;s.phase='chase-intro';s.alarm=true;for(const room of roomIds)s.lights[room]=false;this.checkpoint=JSON.parse(JSON.stringify({state:s,player}));return true;}
   startChase(){if(!['chase-intro','retry'].includes(this.state.phase))return false;this.state.phase='chase';return true;}
   rewind(){if(!this.checkpoint)return null;this.attempts++;this.state=JSON.parse(JSON.stringify(this.checkpoint.state));this.state.phase='retry';return JSON.parse(JSON.stringify(this.checkpoint.player));}
@@ -32,18 +33,23 @@ globalThis.PuzzleSystem=(()=>{
   const mx=x+w*.77,my=cy,mr=r*.95;ctx.save();ctx.beginPath();ctx.arc(mx,my,mr,0,Math.PI*2);ctx.clip();ctx.fillStyle='#222d45';ctx.fillRect(mx-mr,my-mr,2*mr,2*mr);ctx.fillStyle='#e4dfbf';if(s.moon===1)ctx.fillRect(mx,my-mr,mr,2*mr);if(s.moon===2)ctx.fillRect(mx-mr,my-mr,2*mr,2*mr);if(s.moon===3)ctx.fillRect(mx-mr,my-mr,mr,2*mr);ctx.restore();ctx.strokeStyle='#a6acc0';ctx.beginPath();ctx.arc(mx,my,mr,0,Math.PI*2);ctx.stroke();ctx.restore();
  }
  class Controller{
-  constructor(options){Object.assign(this,options);this.game=new Game();this.modal=null;this.visible=false;this.hints=0;this.toastUntil=0;const d=this.document;this.layer=d.getElementById('puzzle-layer');this.panel=d.getElementById('puzzle-modal');this.title=d.getElementById('puzzle-title');this.body=d.getElementById('puzzle-content');this.inventory=d.getElementById('puzzle-inventory');this.notice=d.getElementById('puzzle-notice');d.getElementById('puzzle-close').onclick=()=>this.close();d.getElementById('puzzle-hint').onclick=()=>this.hint();d.getElementById('puzzle-mute').onclick=()=>{this.muted=!this.muted;this.stopAlarm();d.getElementById('puzzle-mute').textContent=this.muted?'開啟音效':'靜音';};this.target.addEventListener('keydown',e=>{if(e.code==='Escape'&&this.visible&&this.modal){e.preventDefault();this.close();}});}
+  constructor(options){Object.assign(this,options);this.game=new Game();this.modal=null;this.visible=false;this.hints=0;this.toastUntil=0;const d=this.document;this.layer=d.getElementById('puzzle-layer');this.panel=d.getElementById('puzzle-modal');this.title=d.getElementById('puzzle-title');this.body=d.getElementById('puzzle-content');this.inventory=d.getElementById('puzzle-inventory');this.notice=d.getElementById('puzzle-notice');d.getElementById('puzzle-close').onclick=()=>this.close();d.getElementById('puzzle-hint').onclick=()=>this.hint();d.getElementById('puzzle-mute').onclick=()=>{this.muted=!this.muted;this.stopAlarm();d.getElementById('puzzle-mute').textContent=this.muted?'開啟音效':'靜音';};this.document.getElementById('wall-dialogue').onclick=()=>this.nextWallLine();this.target.addEventListener('keydown',e=>{if(this.wallLines&&e.code==='Space'&&!e.repeat&&!/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target?.tagName)){e.preventDefault();this.nextWallLine();return;}if(this.wallLines&&e.code==='Escape'){e.preventDefault();this.endWallLines();return;}if(e.code==='Escape'&&this.visible&&this.modal){e.preventDefault();this.close();}});}
   get blocking(){return !!this.modal;}
   element(tag,text){const el=this.document.createElement(tag);if(text!==undefined)el.textContent=text;return el;}
   button(label,action){const b=this.element('button',label);b.type='button';b.onclick=action;this.body.append(b);return b;}
-  show(title,text,kind='text'){this.modal={kind,title,text};this.panel.hidden=false;this.title.textContent=title;this.body.replaceChildren();if(text)this.body.append(this.element('p',text));this.clearInput();}
-  close(){if(this.modal?.kind==='chase-intro')return;this.modal=null;this.panel.hidden=true;this.clearInput();}
+  show(title,text,kind='text'){this.endWallLines();this.modal={kind,title,text};this.panel.hidden=false;this.title.textContent=title;this.body.replaceChildren();if(text)this.body.append(this.element('p',text));this.clearInput();}
+  close(){if(this.modal?.kind==='chase-intro')return;this.endWallLines();this.modal=null;this.panel.hidden=true;this.clearInput();}
   toast(text){this.notice.textContent=text;this.toastUntil=this.target.performance.now()+3000;this.refresh();}
   refresh(){const names={sun_key:'太陽鑰匙',knot_bookmark:'繩結書籤',body_note:'掉落的紙條'};this.inventory.textContent='道具：'+(this.game.state.inventory.map(id=>names[id]||id).join('、')||'無');if(this.game.state.rewardCollected){const b=this.element('button','看書籤');b.type='button';b.onclick=()=>this.bookmark();this.inventory.append(b);}if(this.game.state.inventory.includes('body_note')){const b=this.element('button','看紙條');b.type='button';b.onclick=()=>{if(this.game.state.phase==='explore')this.notePanel();else this.toast('現在只能先逃出去！');};this.inventory.append(b);}}
   setVisible(visible){if(this.visible===visible)return;this.visible=visible;this.layer.hidden=!visible;if(!visible)this.close();else this.refresh();}
+  startWallLines(quote){this.wallLines=[{speaker:'彬彬',text:quote},{speaker:'彬彬的心裡話',text:'明明星空很亮，但環境怎麼好像有點陰暗。'}];this.wallLineIndex=0;this.document.getElementById('wall-dialogue').hidden=false;this.panel.classList.add('with-wall-dialogue');this.renderWallLine();this.document.getElementById('wall-dialogue').focus({preventScroll:true});}
+  renderWallLine(){const line=this.wallLines[this.wallLineIndex];this.document.getElementById('wall-dialogue-speaker').textContent=line.speaker;this.document.getElementById('wall-dialogue-text').textContent=line.text;}
+  nextWallLine(){if(!this.wallLines)return;this.clearInput();if(++this.wallLineIndex>=this.wallLines.length)this.endWallLines();else this.renderWallLine();}
+  endWallLines(){this.wallLines=null;this.document.getElementById('wall-dialogue').hidden=true;this.panel.classList.remove('with-wall-dialogue');}
   celestialPanel(target=false,quote=''){
    if(target){this.calendarPanel();return;}
-   this.show('天象牆｜杰哥原來也有這個興趣?',quote?'彬彬：「'+quote+'」\n彬彬的心裡話：「明明星空很亮，但環境怎麼好像有點陰暗。」':'牆上有太陽、月亮與星群。','celestial');
+   this.show('天象牆｜杰哥原來也有這個興趣?','牆上有太陽、月亮與星群。','celestial');
+   if(quote)this.startWallLines(quote);
    const canvas=this.element('canvas');canvas.width=480;canvas.height=200;canvas.setAttribute('aria-label','目前牆上天象');this.body.append(canvas);drawCelestial(canvas.getContext('2d'),this.game.state.cycle,0,0,480,200,this.game.state.sunTaken);
    if(!target)this.button('觸碰太陽',()=>{const taken=this.game.touchSun();this.celestialPanel(false);this.body.append(this.element('p',taken?'太陽鬆開了，取下的是一把光芒形狀的鑰匙。':this.game.state.sunTaken?'太陽鑰匙已經收好了。':'太陽還卡在牆上，天象似乎尚未相合。'));this.refresh();});
   }
@@ -80,7 +86,7 @@ globalThis.PuzzleSystem=(()=>{
   bookmark(){if(this.game.state.phase!=='explore'){this.toast('現在只能先逃出去！');return;}this.wordPanel('繩結書籤');}
   wordPanel(title='書櫃裡的文字謎題'){
    this.show(title,'請給我你的心臟，重量兩個字','word');this.vinePicture();const label=this.element('label','其心為何（兩個字）'),input=this.element('input');input.type='text';input.maxLength=24;input.setAttribute('aria-label','文字謎題答案');label.append(input);this.body.append(label);const feedback=this.element('p');this.body.append(feedback);
-   const solve=()=>{if(this.game.solveWord(input.value)){this.show('彬彬的心裡話','纏綿...?該不會是要我和杰哥纏綿吧?','word-solved');this.body.append(this.element('p','想出了「纏綿」，還需要到房間裡實際調查。'));}else feedback.textContent='再想想軀體與藤蔓相互纏繞、連綿的樣子。';};this.button('確認答案',solve);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();solve();}});input.focus();
+   const solve=()=>{if(this.game.solveWord(input.value)){this.show('彬彬的心裡話','纏綿...?該不會是要我和杰哥纏綿吧?','word-solved');this.body.append(this.element('p','想出了「纏綿」，還需要到房間裡實際調查。'));}else feedback.textContent=input.value.replace(/[\s，。！？?!,.]/g,'')==='纏繞'?'或許可以再更煽情一點':'再想想軀體與藤蔓相互纏繞、連綿的樣子。';};this.button('確認答案',solve);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();solve();}});input.focus();
   }
   chaseIntro(){this.pursuit=null;this.stopAlarm();this.show('彬彬','好暗，得趕快逃出去','chase-intro');this.body.append(this.element('p','警報響起了。帶著鑰匙，往客廳的書櫃後大門逃！'));this.button(this.game.state.phase==='retry'?'重新挑戰':'趕快逃！',()=>{if(!this.game.startChase())return;this.modal=null;this.panel.hidden=true;this.clearInput();const room=this.maps.currentMap,point=ChaseSystem.spawn(room,this.session.player);if(point)this.pursuit=new ChaseSystem.Pursuit({maps:this.maps,start:{room:room.id,...point},playerSpeed:this.session.player.speed});this.alarmClock=0;this.toast('警報響起！杰哥可能從牆邊出現。');}).focus();this.refresh();}
   stopAlarm(){if(this.alarmOscillator){try{this.alarmOscillator.stop();}catch{}this.alarmOscillator=null;}}
@@ -92,9 +98,10 @@ globalThis.PuzzleSystem=(()=>{
     const cx=105+195*index,cy=125,scale=.25,to=p=>({x:cx+(p.x-640)*scale,y:cy+(p.y-360)*scale});ctx.strokeStyle='#483e32';ctx.lineWidth=3;ctx.beginPath();room.vertices.forEach((p,i)=>{const q=to(p);if(!i)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);});ctx.closePath();ctx.stroke();ctx.fillStyle='#483e32';
     if(room.id==='bedroom'){
      for(const lamp of room.objects.filter(o=>o.role==='oil-lamp')){const b=lamp.visualBounds,q=to({x:b.x+b.width/2,y:b.y+b.height/2});ctx.beginPath();ctx.arc(q.x,q.y,5,0,Math.PI*2);ctx.stroke();if([0,2,4].includes(lamp.lampIndex)){ctx.fillStyle='#8a4f25';ctx.fill();}}
-     const door=room.portals.find(d=>d.target==='living'),p=to(door.center);ctx.fillStyle='#a04436';ctx.beginPath();ctx.moveTo(p.x-5,p.y+7);ctx.lineTo(p.x+8,p.y+3);ctx.lineTo(p.x+2,p.y-7);ctx.closePath();ctx.fill();ctx.fillText('入口',p.x-14,p.y+26);
+
     }
     if(room.id==='library'){ctx.fillStyle='#8a4f25';ctx.fillRect(cx-5,cy-5,10,10);}
+    for(const door of paperDoors(room)){const p=to(door.center),n=door.normal,t={x:-n.y,y:n.x};ctx.fillStyle='#a04436';ctx.beginPath();ctx.moveTo(p.x+n.x*8,p.y+n.y*8);ctx.lineTo(p.x-n.x*6+t.x*6,p.y-n.y*6+t.y*6);ctx.lineTo(p.x-n.x*6-t.x*6,p.y-n.y*6-t.y*6);ctx.closePath();ctx.fill();}
    }
   }
   hint(){if(this.game.state.phase!=='explore'){this.toast('快往客廳左上角大門逃！');return;}this.hints++;let hints=['留意房裡可以調查的物件，地毯下也可能有線索。','日、月、星群各有自己的規律，對照紙上的天象。','日、月、星群週期為3、4、8，完整明暗循環11次後，再主動碰觸太陽。'];if(this.game.state.sunTaken&&!this.game.state.lampsSolved)hints=['書桌抽屜裡的圖形與三個房間相同。','先對準客廳入口，再看五個角落的燈位；多亮也不行。','由客廳入口附近起順時針，亮、暗、亮、暗、亮。'];else if(this.game.state.lampsSolved&&!this.game.state.rewardCollected)hints=['到六角形藏書房中央調查刻痕。'];if(this.game.state.rewardCollected)hints=['臥室掉落的紙條與藏書房的藤蔓圖像，指向相連的意象。','其心是纏綿。解出後還需要實際調查床上的杰哥抱枕。'];this.show('提示 '+Math.min(this.hints,3),hints[Math.min(this.hints-1,hints.length-1)]);}
@@ -114,5 +121,5 @@ globalThis.PuzzleSystem=(()=>{
   get entities(){return this.pursuit&&this.game.state.phase==='chase'&&this.pursuit.delay<=0&&this.pursuit.room===this.maps.currentMap.id?[this.pursuit.actor]:[];}
  }
  function mount(options){return new Controller(options);}
- return {Game,Controller,stateAt,drawCelestial,calendarClue,exitReady,mount};
+ return {Game,Controller,stateAt,drawCelestial,calendarClue,paperDoors,exitReady,mount};
 })();

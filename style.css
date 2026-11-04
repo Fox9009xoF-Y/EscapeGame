@@ -72,3 +72,11 @@ canvas {
 #puzzle-content canvas { width:100%; height:auto; aspect-ratio:auto; image-rendering:auto; }
 #puzzle-content button { margin:.6em .5em 0 0; }
 #puzzle-content input { font:inherit; color:#fff; background:#0d151f; border:1px solid #bc9e65; padding:.6em; max-width:100%; }
+
+#wall-dialogue { position:absolute; z-index:3; inset:auto 3% 2.5%; min-height:22%; padding:1.1% 2%; background:rgba(13,20,29,.96); border:1px solid #b49b69; border-radius:6px; text-align:left; pointer-events:auto; cursor:pointer; }
+#wall-dialogue-speaker { color:#e5c376; font-weight:bold; margin-bottom:.5em; }
+#wall-dialogue-text { line-height:1.6; }
+.wall-dialogue-guidance { text-align:right; font-size:.8em; margin-top:.6em; }
+#puzzle-modal.with-wall-dialogue { align-items:start; }
+#puzzle-modal.with-wall-dialogue .puzzle-card { max-height:62%; }
+#puzzle-modal.with-wall-dialogue canvas { width:min(100%,320px); margin-inline:auto; }

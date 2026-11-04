@@ -56,7 +56,7 @@ globalThis.RoomMaps = (() => {
         const c={x:(e.start.x+e.end.x)/2+t.x*offset+n.x*44,y:(e.start.y+e.end.y)/2+t.y*offset+n.y*44};
         const points=[[-32,-13],[32,-13],[32,13],[-32,13]].map(([u,v])=>({x:c.x+t.x*u+n.x*v,y:c.y+t.y*u+n.y*v}));
         const left=Math.min(...points.map(p=>p.x)),top=Math.min(...points.map(p=>p.y));
-        return {id:'library-wall-bookshelf-'+wallIndex,role:'bookshelf',title:'沿牆書櫃',text:'沿著牆面排列的書櫃，放滿了舊書。',bounds:box(left,top,Math.max(...points.map(p=>p.x))-left,Math.max(...points.map(p=>p.y))-top),collision:box(c.x+n.x*10-18,c.y+n.y*10-8,36,16),solid:true,wallMounted:true,wallIndex,orientation:{center:c,tangent:t,normal:n}};
+        return {id:'library-wall-bookshelf-'+wallIndex,role:'bookshelf',title:'沿牆書櫃',text:[0,1].includes(wallIndex)?'這個書櫃裡放的不是舊書，而是杰哥的A書。':'沿著牆面排列的書櫃，放滿了舊書。',bounds:box(left,top,Math.max(...points.map(p=>p.x))-left,Math.max(...points.map(p=>p.y))-top),collision:box(c.x+n.x*10-18,c.y+n.y*10-8,36,16),solid:true,wallMounted:true,wallIndex,orientation:{center:c,tangent:t,normal:n}};
       }),
     ];
     const door=room.portals[0],c={x:door.center.x+door.tangent.x*52+door.normal.x*12,y:door.center.y+door.tangent.y*52+door.normal.y*12};
