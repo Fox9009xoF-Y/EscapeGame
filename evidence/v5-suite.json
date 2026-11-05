@@ -1,0 +1,13 @@
+{
+  "node": 126,
+  "assets": 1,
+  "chromePrograms": 23,
+  "extraFileEscape": true,
+  "specialProtocols": [
+    "http",
+    "file"
+  ],
+  "manualPlaytest": false,
+  "verifyUnchanged": true,
+  "authorizedBoundaryTolerancePixels": 1e-07
+}

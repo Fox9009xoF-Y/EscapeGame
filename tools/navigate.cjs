@@ -3,12 +3,14 @@ module.exports=async function navigate(page,goal){
  await page.waitForFunction(()=>typeof transitionController==='undefined'||!transitionController?.active);
  if(await page.evaluate(()=>typeof gameController!=='undefined'&&!!gameController?.wallLines&&!gameController.modal)){await page.keyboard.press('Space');await page.waitForTimeout(30);}
 
+ // 地板刻痕已全向互動：走到中心，不再以轉向多走一步離開範圍。
+ if(goal.id){const marker=await page.evaluate(id=>{const o=RoomMaps.currentMap.objects.find(o=>o.id===id);if(o?.role==='reward-marker'){const b=o.visualBounds;return{x:b.x+b.width/2,y:b.y+b.height/2};}},goal.id);if(marker)goal={point:marker};}
  const route=await page.evaluate(goal=>{
   const room=RoomMaps.currentMap,p=playerSession.player;
   // 大留白的路徑找不到時，採較細取樣；兩者仍大於真實腳部8×6。
   for(const[step,halfWidth,halfHeight]of[[12,16,14],[6,10,8]]){
   const queue=[{x:p.x,y:p.y,parent:-1}],seen=new Set(['0,0']);
-  const valid=q=>room.innerVertices.every((a,i)=>{const b=room.innerVertices[(i+1)%room.innerVertices.length],l=Math.hypot(b.x-a.x,b.y-a.y),nx=-(b.y-a.y)/l,ny=(b.x-a.x)/l;return(q.x-a.x)*nx+(q.y-a.y)*ny>=Math.abs(nx)*halfWidth+Math.abs(ny)*halfHeight;})&&!room.obstacles.some(b=>q.x+halfWidth>b.x&&q.x-halfWidth<b.x+b.width&&q.y+halfHeight>b.y&&q.y-halfHeight<b.y+b.height);
+  const valid=q=>room.innerVertices.every((a,i)=>{const b=room.innerVertices[(i+1)%room.innerVertices.length],l=Math.hypot(b.x-a.x,b.y-a.y),nx=-(b.y-a.y)/l,ny=(b.x-a.x)/l;return(q.x-a.x)*nx+(q.y-a.y)*ny>=Math.abs(nx)*halfWidth+Math.abs(ny)*halfHeight;})&&!room.obstacles.some(b=>CollisionShape.overlaps({...q,halfWidth,halfHeight},b));
   for(let n=0;n<queue.length;n++){
    const q=queue[n];let direction=null,found=goal.point&&Math.hypot(q.x-goal.point.x,q.y-goal.point.y)<=9;
    if(goal.id)for(const d of['up','down','left','right'])if(InteractionSystem.findTarget({...q,halfWidth:8,halfHeight:6,direction:d},room)?.id===goal.id){direction=d;found=true;break;}

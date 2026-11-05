@@ -1,0 +1,3 @@
+// 舊回歸新增的對話前置：只在第三次開關指定自語出現時，以真正左鍵繼續；保留全部原斷言。
+const {chromium}=require('playwright'),launch=chromium.launch.bind(chromium);
+chromium.launch=async(...args)=>{const b=await launch(...args),newPage=b.newPage.bind(b);b.newPage=async(...opts)=>{const p=await newPage(...opts),press=p.keyboard.press.bind(p.keyboard);p.keyboard.press=async(...keys)=>{const r=await press(...keys);if(keys[0]==='Space'){await p.waitForTimeout(35);const line=p.locator('#wall-dialogue');if(await line.isVisible()&&await p.locator('#wall-dialogue-text').innerText()==='好暗，杰哥該不會突然跑出來吧')await line.click();}return r;};return p;};return b;};

@@ -61,7 +61,7 @@ canvas {
 #puzzle-hud span { background:#111b24e8; padding:.4em .7em; border-radius:4px; }
 #puzzle-inventory { margin-left:auto; display:inline-flex; align-items:center; gap:.6em; }
 #puzzle-layer button { pointer-events:auto; font:inherit; color:#f4e7cd; background:#26303a; border:1px solid #bc9e65; padding:.4em .8em; border-radius:4px; cursor:pointer; }
-#puzzle-notice { position:absolute; bottom:3%; left:15%; right:15%; text-align:center; background:#111b24e8; border-radius:4px; padding:.6em; }
+#puzzle-notice { position:absolute; bottom:3%; left:15%; right:15%; text-align:center; background:#111b24f5; border:2px solid #e7c77a; border-radius:4px; padding:.8em; font-size:1.15em; font-weight:bold; }
 #puzzle-notice:empty { display:none; }
 #puzzle-alarm { position:absolute; top:7%; left:2%; background:#782f37; color:#fff2db; padding:.3em .7em; border-radius:4px; }
 #puzzle-modal { position:absolute; inset:0; display:grid; place-items:center; padding:3%; background:#080e17a8; pointer-events:auto; }

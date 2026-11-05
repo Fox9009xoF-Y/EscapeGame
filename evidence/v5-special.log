@@ -1,0 +1,8 @@
+page.evaluate: SecurityError: Failed to execute 'getImageData' on 'CanvasRenderingContext2D': The canvas has been tainted by cross-origin data.
+    at eval (eval at evaluate (:311:30), <anonymous>:1:105)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tools\verify-v5.cjs:3:160 {
+  log: []
+}
+V5 HTTP/file 首次提示、牆前碰撞、六櫃可達、天象閃光、中央全向及站上拾取通過

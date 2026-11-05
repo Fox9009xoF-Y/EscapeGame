@@ -1,0 +1,36 @@
+✔ 遊戲右鍵不開選單；放鍵與pointercancel清除輸入，仍可重新移動 (5.3185ms)
+✔ 上方紙張改為杰哥A書代購清單，調查不再開回答框 (2.6191ms)
+✔ 斜向書櫃貼內牆，碰撞四角與64×26模型相符，不以外接矩形阻擋 (6.4741ms)
+✔ 模型連續掃掠不能穿透，可沿模型平滑滑動，追捕採相同碰撞形狀 (3.9567ms)
+✖ 遊戲內答案輸入框仍可使用一般右鍵選單 (3.0568ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 107.7581
+
+✖ failing tests:
+
+test at tests\controls-shelves-v6.test.cjs:9:1
+✖ 遊戲內答案輸入框仍可使用一般右鍵選單 (3.0568ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\controls-shelves-v6.test.cjs:9:226)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,32 @@
+[
+  {
+    "protocol": "http",
+    "rightClickKeys": 8,
+    "contextSuppressed": true,
+    "inputContextPreserved": true,
+    "stopAndResume": true,
+    "paperReadOnly": true,
+    "shelvesReachable": 6,
+    "physics": {
+      "violations": 0,
+      "polygons": 5
+    },
+    "manualPlaytest": false,
+    "errors": []
+  },
+  {
+    "protocol": "file",
+    "rightClickKeys": 8,
+    "contextSuppressed": true,
+    "inputContextPreserved": true,
+    "stopAndResume": true,
+    "paperReadOnly": true,
+    "shelvesReachable": 6,
+    "physics": {
+      "violations": 0,
+      "polygons": 5
+    },
+    "manualPlaytest": false,
+    "errors": []
+  }
+]

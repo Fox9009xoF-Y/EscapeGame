@@ -1,3 +1,4 @@
+const {overlaps}=require('./helpers/shape-check.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 function load(){class Image{set src(v){if(this.onload)this.onload();}}const s=vm.createContext({Image,URLSearchParams,location:{search:''}});for(const f of ['maps.js','player.js','interactions.js'])vm.runInContext(fs.readFileSync(f,'utf8'),s);return s;}
 const plain=x=>JSON.parse(JSON.stringify(x));
@@ -26,7 +27,7 @@ test('臥室五燈按入口方向順時針配置，抱枕位於床內而可從�
 test('藏書房有書櫃文字線索與可通行的中央生成標示，不先生成獎勵',()=>{
  const s=load(),r=s.RoomMaps.maps[2],marker=r.objects.find(o=>o.role==='reward-marker');assert.ok(marker);
  assert.equal(marker.solid,false);assert.equal(marker.visualBounds.x+marker.visualBounds.width/2,640);assert.equal(marker.visualBounds.y+marker.visualBounds.height/2,360);
- assert.ok(valid({x:640,y:360},r));assert.ok(r.objects.some(o=>o.role==='word-clue'));assert.ok(!r.objects.some(o=>o.role==='reward-item'));
+ assert.ok(valid({x:640,y:360},r));assert.ok(r.objects.some(o=>o.role==='purchase-list'));assert.ok(!r.objects.some(o=>o.role==='reward-item'));
 });
 test('所有新增物件有穩定ID、合法邊界、碰撞一致與可達互動點',()=>{
  const s=load();for(const r of s.RoomMaps.maps){
@@ -36,7 +37,7 @@ test('所有新增物件有穩定ID、合法邊界、碰撞一致與可達互動
   for(const o of r.objects.slice(2)){
    assert.ok(o.id&&o.title&&o.text&&Number.isFinite(o.depth));
    if(o.solid)assert.ok(r.obstacles.includes(o.collision));else assert.ok(!r.obstacles.includes(o.collision));
-   const b=o.visualBounds;for(const p of[{x:b.x,y:b.y},{x:b.x+b.width,y:b.y},{x:b.x+b.width,y:b.y+b.height},{x:b.x,y:b.y+b.height}])assert.ok(r.vertices.every((a,i)=>{const c=r.vertices[(i+1)%r.vertices.length];return (c.x-a.x)*(p.y-a.y)-(c.y-a.y)*(p.x-a.x)>=-1e-7;}),o.id+' 繪圖越界');
+   const b=o.visualBounds;for(const p of(o.collision.vertices||[{x:b.x,y:b.y},{x:b.x+b.width,y:b.y},{x:b.x+b.width,y:b.y+b.height},{x:b.x,y:b.y+b.height}]))assert.ok(r.vertices.every((a,i)=>{const c=r.vertices[(i+1)%r.vertices.length];return (c.x-a.x)*(p.y-a.y)-(c.y-a.y)*(p.x-a.x)>=-1e-7;}),o.id+' 繪圖越界');
    if(o.role==='escape-door')continue; // 由書櫃遮住，N6移櫃後才可直接操作門。
    assert.ok(queue.some(pos=>['up','down','left','right'].some(direction=>{const p=new s.PlayerSystem.Player(pos.x,pos.y);p.direction=direction;return s.InteractionSystem.findTarget(p,r)?.id===o.id;})),o.id+' 無法靠近調查');
   }

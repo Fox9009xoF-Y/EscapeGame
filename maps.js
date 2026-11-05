@@ -1,5 +1,17 @@
 'use strict';
 
+globalThis.CollisionShape=(()=>{
+ const epsilon=1e-8,cache=new WeakMap();
+ const points=b=>b.vertices||[{x:b.x,y:b.y},{x:b.x+b.width,y:b.y},{x:b.x+b.width,y:b.y+b.height},{x:b.x,y:b.y+b.height}];
+ function axes(b){if(cache.has(b))return cache.get(b).axes;const result=[{x:1,y:0},{x:0,y:1}];if(b.vertices)for(let i=0;i<b.vertices.length;i++){const a=b.vertices[i],z=b.vertices[(i+1)%b.vertices.length],l=Math.hypot(z.x-a.x,z.y-a.y);result.push({x:-(z.y-a.y)/l,y:(z.x-a.x)/l});}if(Object.isFrozen(b))cache.set(b,{axes:result,ranges:new Map()});return result;}
+ function range(b,a){const memo=cache.get(b);if(memo?.ranges.has(a))return memo.ranges.get(a);const v=points(b).map(p=>p.x*a.x+p.y*a.y),r={min:Math.min(...v),max:Math.max(...v)};memo?.ranges.set(a,r);return r;}
+ function interval(p,a){const c=p.x*a.x+p.y*a.y,r=Math.abs(a.x)*(p.halfWidth||0)+Math.abs(a.y)*(p.halfHeight||0);return {min:c-r,max:c+r};}
+ function overlaps(p,b,tolerance=epsilon){return axes(b).every(a=>{const r=range(b,a),q=interval(p,a);return q.max>r.min+tolerance&&q.min<r.max-tolerance;});}
+ function contacts(p,b){const normals=[],all=axes(b);if(all.some(a=>{const r=range(b,a),q=interval(p,a);return q.max<r.min-1e-6||q.min>r.max+1e-6;}))return normals;for(const a of all){const r=range(b,a),q=interval(p,a);if(Math.abs(q.max-r.min)<1e-6)normals.push({x:-a.x,y:-a.y});if(Math.abs(q.min-r.max)<1e-6)normals.push(a);}return normals;}
+ function sweep(p,dx,dy,b){let enter=-Infinity,exit=Infinity,normals=[];for(const a of axes(b)){const r=range(b,a),q=interval(p,a),v=dx*a.x+dy*a.y;if(Math.abs(v)<epsilon){if(q.max<=r.min+epsilon||q.min>=r.max-epsilon)return null;continue;}const one=(r.min-q.max)/v,two=(r.max-q.min)/v,near=Math.min(one,two),far=Math.max(one,two),n={x:-Math.sign(v)*a.x,y:-Math.sign(v)*a.y};if(near>enter+epsilon){enter=near;normals=[n];}else if(Math.abs(near-enter)<=epsilon)normals.push(n);exit=Math.min(exit,far);if(enter>exit+epsilon)return null;}if(enter< -epsilon||enter>1+epsilon||exit<=Math.max(0,enter)+epsilon)return null;return {time:Math.max(0,enter),normals};}
+ return {points,overlaps,contacts,sweep};
+})();
+
 globalThis.RoomMaps = (() => {
   const center = Object.freeze({ x: 640, y: 360 });
   const wallThickness = 24;
@@ -32,7 +44,7 @@ globalThis.RoomMaps = (() => {
 
       {id:'living-moon-reference',role:'moon-reference',title:'月相對照紙',text:'牆上貼著農曆日與月相的對照圖。',bounds:box(790,140,52,44),wallMounted:true},
       { id:'living-carpet-clue', role:'carpet-clue', title:'地毯的一角', text:'地毯的一角微微翹起，底下露出一張紙。', bounds:box(624,340,24,16), floor:true },
-      { id:'living-desk', role:'desk', title:'書桌抽屜', text:'書桌抽屜裡露出一張摺好的紙。', bounds:box(800,188,56,48), solid:true },
+      { id:'living-desk', role:'desk', title:'書桌抽屜', text:'書桌抽屜裡露出一張摺好的紙。', bounds:box(736,252,56,48), solid:true },
       { id:'living-exit-bookshelf', role:'exit-bookshelf', title:'擋住門的書櫃', text:'書櫃後似乎有一道門。櫃側的鎖孔呈太陽形狀。', bounds:box(420,134,168,48), solid:true, modules:3 },
       { id:'living-exit', role:'escape-door', title:'書櫃後的大門', text:'大門被書櫃擋住，現在無法通過。', bounds:box(420,106,56,24), interaction:box(420,134,168,48), priority:-1, parentId:'living-exit-bookshelf' },
       { id:'living-lower-bookshelf', role:'bookshelf', title:'客廳下方書櫃', text:'書櫃裡放著幾本舊書。', bounds:box(432,506,104,44), solid:true },
@@ -47,14 +59,14 @@ globalThis.RoomMaps = (() => {
       { id:'bedroom-low-table', role:'low-table', title:'床邊矮桌', text:'矮桌緊挨著床邊。', bounds:box(708,300,24,28),solid:true },
       { id:'bedroom-lower-bookshelf', role:'bookshelf', title:'臥室下方書櫃', text:'靠牆的書櫃裡塞著一些雜物。', bounds:box(620,538,124,28),solid:true,wallMounted:true,wallIndex:2 },
     ] : [
-      { id:'library-word-clue', role:'word-clue', title:'書櫃裡的便條', text:'書頁間夾著一張寫有字句的紙。', bounds:box(692,168,14,22), interaction:box(688,194,24,6), priority:2, parentId:'library-1', depth:201 },
+      { id:'library-word-clue', role:'purchase-list', title:'杰哥A書代購清單', text:'杰哥A書代購清單', bounds:box(692,156.1923788646684,14,22), interaction:box(688,182.1923788646684,24,6), priority:2, parentId:'library-1', depth:201 },
       { id:'library-reward-marker', role:'reward-marker', title:'中央刻痕', text:'地板中央有一圈刻痕，中間空著。', bounds:box(626,346,28,28), interaction:box(626,374,28,8), floor:true },
       { id:'library-lamp-1', role:'oil-lamp', title:'藏書房油燈', text:'書櫃旁放著一盞油燈。', bounds:box(466,312,16,28),collision:box(466,324,16,16),solid:true },
       ...[0,1,2,3,5].map(wallIndex => {
         const e=room.edges[wallIndex],length=Math.hypot(e.end.x-e.start.x,e.end.y-e.start.y);
         const t={x:(e.end.x-e.start.x)/length,y:(e.end.y-e.start.y)/length},n={x:-t.y,y:t.x};
         const offset=wallIndex===2?-88:wallIndex===0?70:0;
-        const c={x:(e.start.x+e.end.x)/2+t.x*offset+n.x*44,y:(e.start.y+e.end.y)/2+t.y*offset+n.y*44};
+        const c={x:(e.start.x+e.end.x)/2+t.x*offset+n.x*37,y:(e.start.y+e.end.y)/2+t.y*offset+n.y*37};
         const points=[[-32,-13],[32,-13],[32,13],[-32,13]].map(([u,v])=>({x:c.x+t.x*u+n.x*v,y:c.y+t.y*u+n.y*v}));
         const left=Math.min(...points.map(p=>p.x)),top=Math.min(...points.map(p=>p.y));
         return {id:'library-wall-bookshelf-'+wallIndex,role:'bookshelf',title:'沿牆書櫃',text:[0,1].includes(wallIndex)?'這個書櫃裡放的不是舊書，而是杰哥的A書。':'沿著牆面排列的書櫃，放滿了舊書。',bounds:box(left,top,Math.max(...points.map(p=>p.x))-left,Math.max(...points.map(p=>p.y))-top),collision:box(c.x+n.x*10-18,c.y+n.y*10-8,36,16),solid:true,wallMounted:true,wallIndex,orientation:{center:c,tangent:t,normal:n}};
@@ -62,10 +74,17 @@ globalThis.RoomMaps = (() => {
     ];
     const door=room.portals[0],c={x:door.center.x+door.tangent.x*52+door.normal.x*12,y:door.center.y+door.tangent.y*52+door.normal.y*12};
     defs.push({id:id+'-switch',role:'light-switch',title:'牆上開關',text:'牆上有一個老舊的電燈開關。',bounds:box(c.x-5,c.y-6,10,12),interaction:box(c.x+door.normal.x*18-9,c.y+door.normal.y*18-9,18,18),wallMounted:true,wallIndex:door.edgeIndex});
-    return defs.map(makeSceneObject);
+    return defs.map(def=>makeSceneObject(def,room));
   }
 
-  function makeSceneObject(def) {
+  function makeSceneObject(def,room) {
+      if(room?.id==='living'&&['celestial-wall','moon-reference'].includes(def.role)){
+        const b=def.bounds,top=Math.min(...room.innerVertices.map(v=>v.y));def={...def,solid:true,collision:{x:b.x,y:top,width:b.width,height:b.y+b.height-top}};
+      }
+      if(room?.id==='library'&&def.role==='bookshelf'){
+        if(def.orientation){const {center:c,tangent:t,normal:n}=def.orientation;const vertices=Object.freeze([[-32,-13],[32,-13],[32,13],[-32,13]].map(([u,v])=>Object.freeze({x:c.x+t.x*u+n.x*v,y:c.y+t.y*u+n.y*v})));def={...def,collision:{...def.bounds,vertices}};}
+        else{const top=Math.min(...room.innerVertices.map(v=>v.y)),bounds={...def.bounds,y:top};def={...def,bounds,collision:bounds};}
+      }
       const visualBounds = Object.freeze(def.bounds);
       const collision = def.collision ? Object.freeze(def.collision) : visualBounds;
       const interactionBounds = def.interaction ? Object.freeze(def.interaction) : collision;
@@ -96,7 +115,7 @@ globalThis.RoomMaps = (() => {
             for(const [dx,dy]of [[17,11],[28,32],[82,8],[126,26],[92,38]]){rect('#c1c7d5',dx,dy,3,3);}
           } else if(def.role==='light-switch') {
             rect('#b0a68e',0,0,w,h);rect('#ddd1b2',3,3,6,8);rect('#544b40',3,12,6,3);
-          } else if(def.role==='carpet-clue'||def.role==='word-clue'||def.role==='moon-reference') {
+          } else if(def.role==='carpet-clue'||def.role==='word-clue'||def.role==='purchase-list'||def.role==='moon-reference') {
             rect('#d6c69f',0,0,w,h);for(let row=4;row<h-2;row+=5)rect('#817559',3,row,w-6,1);
             if(def.role==='carpet-clue')polygon('#8b6a52',[[0,0],[8,0],[0,9]]);
           } else if(def.role==='desk') {
@@ -166,7 +185,7 @@ globalThis.RoomMaps = (() => {
         {id:'library-0',role:'oil-lamp',title:'藏書房油燈',text:'書櫃旁放著一盞油燈。',bounds:box(780,430,16,28),collision:box(780,442,16,16),solid:true},
         {id:'library-1',role:'bookshelf',title:'藏書架',text:'書背都蒙著灰，只有一本書像是剛被放回去。',bounds:box(565,136,150,64),solid:true,wallMounted:true,wallIndex:4},
       ];
-      this.objects=Object.freeze(bases.map(makeSceneObject));
+      this.objects=Object.freeze(bases.map(def=>makeSceneObject(def,this)));
       this.obstacles=Object.freeze(this.objects.filter(o=>o.solid).map(o=>o.collision));
       this.portals = makePortals(this);
       const interiors = makeInteriors(this);
@@ -229,7 +248,7 @@ globalThis.RoomMaps = (() => {
   function drawGlows(ctx,room){ctx.save();ctx.beginPath();path(ctx,room.vertices);ctx.clip();ctx.globalAlpha=glowAlpha();ctx.fillStyle='#ffe5a1';ctx.shadowColor='#ffe5a1';ctx.shadowBlur=14;for(const o of room.objects.filter(o=>o.title&&o.text)){
     if(o.role==='escape-door'&&room.objects.some(p=>p.id===room.exit?.coverId))continue;const b=o.visualBounds||o.collision;ctx.fillRect(b.x,b.y,b.width,2);ctx.fillRect(b.x,b.y+b.height-2,b.width,2);ctx.fillRect(b.x,b.y,2,b.height);ctx.fillRect(b.x+b.width-2,b.y,2,b.height);
    }ctx.restore();}
-  function draw(ctx, entities = []) {
+  function draw(ctx, entities = [], drawObject = (ctx,o)=>o.draw(ctx)) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = '18px sans-serif';
@@ -279,7 +298,7 @@ globalThis.RoomMaps = (() => {
     }
     ctx.restore();
 
-    [...room.objects, ...entities].sort((a, b) => a.depth - b.depth).forEach(entity => entity.draw(ctx));
+    [...room.objects, ...entities].sort((a, b) => a.depth - b.depth).forEach(entity => room.objects.includes(entity)?drawObject(ctx,entity):entity.draw(ctx));
 
     drawGlows(ctx,room);
     ctx.fillStyle = '#c6c1b1';

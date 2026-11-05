@@ -2,7 +2,7 @@
 globalThis.ChaseSystem=(()=>{
  function speedAfterDeaths(base,deaths){return Math.max(.1,base-.1*Math.max(0,deaths-5)**2);}
  const step=12;
- function valid(room,p){return room.innerVertices.every((a,i)=>{const b=room.innerVertices[(i+1)%room.innerVertices.length],l=Math.hypot(b.x-a.x,b.y-a.y),nx=-(b.y-a.y)/l,ny=(b.x-a.x)/l;return(p.x-a.x)*nx+(p.y-a.y)*ny>=Math.abs(nx)*8+Math.abs(ny)*6-1e-7;})&&!room.obstacles.some(b=>p.x+8>b.x+1e-7&&p.x-8<b.x+b.width-1e-7&&p.y+6>b.y+1e-7&&p.y-6<b.y+b.height-1e-7);}
+ function valid(room,p){return room.innerVertices.every((a,i)=>{const b=room.innerVertices[(i+1)%room.innerVertices.length],l=Math.hypot(b.x-a.x,b.y-a.y),nx=-(b.y-a.y)/l,ny=(b.x-a.x)/l;return(p.x-a.x)*nx+(p.y-a.y)*ny>=Math.abs(nx)*8+Math.abs(ny)*6-1e-7;})&&!room.obstacles.some(b=>CollisionShape.overlaps({...p,halfWidth:8,halfHeight:6},b,1e-7));}
  function line(room,a,b){const count=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y)/3);for(let i=0;i<=count;i++){const k=count?i/count:0;if(!valid(room,{x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k}))return false;}return true;}
  function nearby(room,p){const candidates=[];for(let dx=-3;dx<=3;dx++)for(let dy=-3;dy<=3;dy++){const q={x:(Math.round(p.x/step)+dx)*step,y:(Math.round(p.y/step)+dy)*step};if(valid(room,q))candidates.push(q);}return candidates.sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y));}
  function findPath(room,from,to){
