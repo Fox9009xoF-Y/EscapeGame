@@ -29,19 +29,19 @@ const g=require('./gameplay.cjs'),navigate=require('./navigate.cjs'),prefix=proc
   await p.getByRole('button',{name:'重新挑戰',exact:true}).click();
   await open();await p.screenshot({path:prefix+'-open-door.png'});
   await navigate(p,{point:{x:448,y:155}});await p.keyboard.down('ArrowUp');
-  try{await p.waitForFunction(()=>storyController.mode==='ending',null,{timeout:4000});}finally{await p.keyboard.up('ArrowUp');}
+  try{await p.waitForFunction(()=>storyController.mode==='success'&&!transitionController.active,null,{timeout:4000});}finally{await p.keyboard.up('ArrowUp');}
   assert.equal(await p.evaluate(()=>gameController.game.state.phase),'escaped');
   assert.equal(await p.evaluate(()=>gameController.game.state.alarm),false);
   assert.equal(await p.evaluate(()=>gameController.pursuit),null);
-  await p.screenshot({path:prefix+'-ending.png'});
-  let lines=0;while(await p.evaluate(()=>storyController.mode==='ending')){await p.keyboard.press('Space');await p.waitForTimeout(175);lines++;}
+  await p.screenshot({path:prefix+'-success.png'});await p.keyboard.press('Space');assert.equal(await p.evaluate(()=>storyController.mode),'success');await p.mouse.click(640,360,{button:'right'});assert.equal(await p.evaluate(()=>storyController.mode),'success');await p.locator('#escape-success').click();await g.idle(p);assert.equal(await p.evaluate(()=>storyController.mode),'ending');await p.screenshot({path:prefix+'-ending.png'});
+  let lines=0;while(await p.evaluate(()=>storyController.mode==='ending')){await p.keyboard.press('Space');await p.waitForTimeout(175);await g.idle(p);lines++;}
   assert.equal(await p.evaluate(()=>storyController.mode),'finished');
   for(let i=0;i<4;i++)await p.keyboard.press('Space');await p.mouse.click(640,360);await p.waitForTimeout(200);
   assert.equal(await p.evaluate(()=>storyController.mode),'finished');
   assert.equal(await p.evaluate(()=>gameController.game.attempts),1);
   assert.equal(await p.locator('#puzzle-layer').isVisible(),false);
   await p.screenshot({path:prefix+'-finished.png'});assert.deepEqual(errors,[]);
-  fs.writeFileSync(prefix+'-results.json',JSON.stringify({protocol:await p.evaluate(()=>location.protocol),fullKeyboardEscape:true,coverRemoved:true,doorOpenedSeparately:true,walkOutsideRequired:true,alarmStopped:true,openedExitRetry:restored,finishedInputStable:true,endingLines:lines,errors},null,2));
+  fs.writeFileSync(prefix+'-results.json',JSON.stringify({protocol:await p.evaluate(()=>location.protocol),fullKeyboardEscape:true,coverRemoved:true,doorOpenedSeparately:true,walkOutsideRequired:true,alarmStopped:true,successRequiresLeftClick:true,openedExitRetry:restored,finishedInputStable:true,endingLines:lines,errors},null,2));
   console.log('N6真實鍵盤全流程、開門後被抓恢復書櫃碰撞、重試逃出與結尾後輸入檢查完成');
  }finally{await b.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

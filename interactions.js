@@ -1,22 +1,13 @@
 'use strict';
 
 globalThis.InteractionSystem = (() => {
-  function findTarget(player, room) {
-    const reach = 32, p = player;
-    const box = player.direction === 'up' ? { x:p.x-p.halfWidth, y:p.y-p.halfHeight-reach, width:p.halfWidth*2, height:reach }
-      : player.direction === 'down' ? { x:p.x-p.halfWidth, y:p.y+p.halfHeight, width:p.halfWidth*2, height:reach }
-      : player.direction === 'left' ? { x:p.x-p.halfWidth-reach, y:p.y-p.halfHeight, width:reach, height:p.halfHeight*2 }
-      : { x:p.x+p.halfWidth, y:p.y-p.halfHeight, width:reach, height:p.halfHeight*2 };
-    const overlap = b => b.x < box.x+box.width && b.x+b.width > box.x && b.y < box.y+box.height && b.y+b.height > box.y;
-    const distance = b => player.direction === 'up' ? p.y-b.y-b.height : player.direction === 'down' ? b.y-p.y
-      : player.direction === 'left' ? p.x-b.x-b.width : b.x-p.x;
-    const bounds = object => object.interactionBounds || object.collision;
-    const candidates = room.objects.filter(o => o.title && o.text && overlap(bounds(o)))
-      .sort((a,b)=>distance(bounds(a))-distance(bounds(b)) || (b.priority || 0)-(a.priority || 0));
-    const target = candidates[0];
-    if (!target) return null;
-    if (room.obstacles.some(b => b !== target.collision && overlap(b) && distance(b) < distance(bounds(target)))) return null;
-    return target;
+  function findTarget(player,room,{escape=false}={}){
+    const p=player,boxFor=(mult=1)=>{const reach=32*mult,w=p.halfWidth*mult,h=p.halfHeight*mult;return p.direction==='up'?{x:p.x-w,y:p.y-p.halfHeight-reach,width:w*2,height:reach}:p.direction==='down'?{x:p.x-w,y:p.y+p.halfHeight,width:w*2,height:reach}:p.direction==='left'?{x:p.x-p.halfWidth-reach,y:p.y-h,width:reach,height:h*2}:{x:p.x+p.halfWidth,y:p.y-h,width:reach,height:h*2};};
+    const overlap=(b,box)=>b.x<box.x+box.width&&b.x+b.width>box.x&&b.y<box.y+box.height&&b.y+b.height>box.y;
+    const distance=b=>p.direction==='up'?p.y-b.y-b.height:p.direction==='down'?b.y-p.y:p.direction==='left'?p.x-b.x-b.width:b.x-p.x;
+    const bounds=o=>o.interactionBounds||o.collision,mult=o=>escape&&['exit-bookshelf','escape-door'].includes(o.role)?2:1;
+    const target=room.objects.filter(o=>o.title&&o.text&&overlap(bounds(o),boxFor(mult(o)))).sort((a,b)=>distance(bounds(a))-distance(bounds(b))||(b.priority||0)-(a.priority||0))[0];
+    if(!target)return null;const box=boxFor(mult(target));if(room.obstacles.some(b=>b!==target.collision&&overlap(b,box)&&distance(b)<distance(bounds(target))))return null;return target;
   }
 
   class Controller {
@@ -29,7 +20,7 @@ globalThis.InteractionSystem = (() => {
       }
       if (!pressed) return false;
       if (this.message) { this.message = null; return true; }
-      const object = findTarget(session.player, this.maps.currentMap);
+      const object = findTarget(session.player, this.maps.currentMap,{escape:!!this.escapeMode?.()});
       if (!object) return false;
       if (this.onInteract && this.onInteract(object)) return true;
       this.message = { id:object.id, title:object.title, text:object.text };

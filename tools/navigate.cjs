@@ -1,5 +1,8 @@
 // 根據目前內裝尋路，以真正方向鍵走位；不直接寫入玩家座標。
 module.exports=async function navigate(page,goal){
+ await page.waitForFunction(()=>typeof transitionController==='undefined'||!transitionController?.active);
+ if(await page.evaluate(()=>typeof gameController!=='undefined'&&!!gameController?.wallLines&&!gameController.modal)){await page.keyboard.press('Space');await page.waitForTimeout(30);}
+
  const route=await page.evaluate(goal=>{
   const room=RoomMaps.currentMap,p=playerSession.player;
   // 大留白的路徑找不到時，採較細取樣；兩者仍大於真實腳部8×6。

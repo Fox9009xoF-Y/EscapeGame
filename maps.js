@@ -30,6 +30,7 @@ globalThis.RoomMaps = (() => {
     const defs = id === 'living' ? [
       { id:'living-celestial', role:'celestial-wall', title:'天象牆', text:'牆上嵌著太陽、月亮與一圈星星。', bounds:box(624,140,148,52), solid:true },
 
+      {id:'living-moon-reference',role:'moon-reference',title:'月相對照紙',text:'牆上貼著農曆日與月相的對照圖。',bounds:box(790,140,52,44),wallMounted:true},
       { id:'living-carpet-clue', role:'carpet-clue', title:'地毯的一角', text:'地毯的一角微微翹起，底下露出一張紙。', bounds:box(624,340,24,16), floor:true },
       { id:'living-desk', role:'desk', title:'書桌抽屜', text:'書桌抽屜裡露出一張摺好的紙。', bounds:box(800,188,56,48), solid:true },
       { id:'living-exit-bookshelf', role:'exit-bookshelf', title:'擋住門的書櫃', text:'書櫃後似乎有一道門。櫃側的鎖孔呈太陽形狀。', bounds:box(420,134,168,48), solid:true, modules:3 },
@@ -95,7 +96,7 @@ globalThis.RoomMaps = (() => {
             for(const [dx,dy]of [[17,11],[28,32],[82,8],[126,26],[92,38]]){rect('#c1c7d5',dx,dy,3,3);}
           } else if(def.role==='light-switch') {
             rect('#b0a68e',0,0,w,h);rect('#ddd1b2',3,3,6,8);rect('#544b40',3,12,6,3);
-          } else if(def.role==='carpet-clue'||def.role==='word-clue') {
+          } else if(def.role==='carpet-clue'||def.role==='word-clue'||def.role==='moon-reference') {
             rect('#d6c69f',0,0,w,h);for(let row=4;row<h-2;row+=5)rect('#817559',3,row,w-6,1);
             if(def.role==='carpet-clue')polygon('#8b6a52',[[0,0],[8,0],[0,9]]);
           } else if(def.role==='desk') {
@@ -222,6 +223,12 @@ globalThis.RoomMaps = (() => {
     }
   }
 
+  let glowTime=0;
+  function tickGlow(dt){glowTime+=dt;}
+  function glowAlpha(){return .09+.055*(1+Math.sin(glowTime*2.2));}
+  function drawGlows(ctx,room){ctx.save();ctx.beginPath();path(ctx,room.vertices);ctx.clip();ctx.globalAlpha=glowAlpha();ctx.fillStyle='#ffe5a1';ctx.shadowColor='#ffe5a1';ctx.shadowBlur=7;for(const o of room.objects.filter(o=>o.title&&o.text)){
+    if(o.role==='escape-door'&&room.objects.some(p=>p.id===room.exit?.coverId))continue;const b=o.visualBounds||o.collision;ctx.fillRect(b.x,b.y,b.width,1);ctx.fillRect(b.x,b.y+b.height-1,b.width,1);ctx.fillRect(b.x,b.y,1,b.height);ctx.fillRect(b.x+b.width-1,b.y,1,b.height);
+   }ctx.restore();}
   function draw(ctx, entities = []) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -274,9 +281,10 @@ globalThis.RoomMaps = (() => {
 
     [...room.objects, ...entities].sort((a, b) => a.depth - b.depth).forEach(entity => entity.draw(ctx));
 
+    drawGlows(ctx,room);
     ctx.fillStyle = '#c6c1b1';
     ctx.fillText(room.name, center.x, 30);
   }
 
-  return { Map: RoomMap, get maps(){return exitRevealed?revealedMaps:maps;}, get currentMap() { return effective(currentMap); }, setCurrentMap, setExitRevealed, draw };
+  return { Map: RoomMap, get maps(){return exitRevealed?revealedMaps:maps;}, get currentMap() { return effective(currentMap); }, setCurrentMap, setExitRevealed, tickGlow, glowAlpha, draw };
 })();

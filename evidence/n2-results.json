@@ -17,6 +17,11 @@
     },
     {
       "room": "living",
+      "id": "living-moon-reference",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
       "id": "living-carpet-clue",
       "keyboardReachable": true
     },

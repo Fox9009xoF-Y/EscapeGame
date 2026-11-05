@@ -1,5 +1,6 @@
 'use strict';
 globalThis.ChaseSystem=(()=>{
+ function speedAfterDeaths(base,deaths){return Math.max(.1,base-.1*Math.max(0,deaths-5)**2);}
  const step=12;
  function valid(room,p){return room.innerVertices.every((a,i)=>{const b=room.innerVertices[(i+1)%room.innerVertices.length],l=Math.hypot(b.x-a.x,b.y-a.y),nx=-(b.y-a.y)/l,ny=(b.x-a.x)/l;return(p.x-a.x)*nx+(p.y-a.y)*ny>=Math.abs(nx)*8+Math.abs(ny)*6-1e-7;})&&!room.obstacles.some(b=>p.x+8>b.x+1e-7&&p.x-8<b.x+b.width-1e-7&&p.y+6>b.y+1e-7&&p.y-6<b.y+b.height-1e-7);}
  function line(room,a,b){const count=Math.ceil(Math.hypot(a.x-b.x,a.y-b.y)/3);for(let i=0;i<=count;i++){const k=count?i/count:0;if(!valid(room,{x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k}))return false;}return true;}
@@ -14,7 +15,7 @@ globalThis.ChaseSystem=(()=>{
  function spawn(room,player){const candidates=[];room.innerVertices.forEach((a,i)=>{const b=room.innerVertices[(i+1)%room.innerVertices.length],l=Math.hypot(b.x-a.x,b.y-a.y),n={x:-(b.y-a.y)/l,y:(b.x-a.x)/l};for(const t of[.2,.5,.8]){const p={x:a.x+(b.x-a.x)*t+n.x*26,y:a.y+(b.y-a.y)*t+n.y*26};if(valid(room,p)&&Math.hypot(p.x-player.x,p.y-player.y)>=160&&findPath(room,p,player).length)candidates.push(p);}});return candidates.sort((a,b)=>Math.hypot(b.x-player.x,b.y-player.y)-Math.hypot(a.x-player.x,a.y-player.y))[0]||null;}
  function visible(player,p){return Math.hypot(player.x-p.x,player.y-p.y)<=96;}
  class Pursuit{
-  constructor({maps,start,playerSpeed=360}){this.maps=maps;this.room=start.room;this.actor=new PlayerSystem.Player(start.x,start.y);this.actor.speed=playerSpeed*.6;this.actor.draw=ctx=>{const p=this.actor;ctx.save();ctx.fillStyle='#17202b';ctx.fillRect(p.x-11,p.y-22,22,27);ctx.fillStyle='#be9d7a';ctx.fillRect(p.x-9,p.y-37,18,18);ctx.fillStyle='#161920';ctx.fillRect(p.x-8,p.y-32,6,4);ctx.fillRect(p.x+2,p.y-32,6,4);ctx.fillRect(p.x-2,p.y-31,4,2);ctx.fillStyle='#583238';ctx.fillRect(p.x-9,p.y-17,18,17);ctx.restore();};this.path=[];this.delay=1.5;this.timer=0;this.targetKey='';}
+  constructor({maps,start,playerSpeed=360,deaths=0}){this.maps=maps;this.room=start.room;this.actor=new PlayerSystem.Player(start.x,start.y);this.actor.speed=speedAfterDeaths(playerSpeed*.6,deaths);this.actor.draw=ctx=>{const p=this.actor;ctx.save();ctx.fillStyle='#17202b';ctx.fillRect(p.x-11,p.y-22,22,27);ctx.fillStyle='#be9d7a';ctx.fillRect(p.x-9,p.y-37,18,18);ctx.fillStyle='#161920';ctx.fillRect(p.x-8,p.y-32,6,4);ctx.fillRect(p.x+2,p.y-32,6,4);ctx.fillRect(p.x-2,p.y-31,4,2);ctx.fillStyle='#583238';ctx.fillRect(p.x-9,p.y-17,18,17);ctx.restore();};this.path=[];this.delay=1.5;this.timer=0;this.targetKey='';}
   nextRoom(target){const queue=[this.room],parent=new Map([[this.room,null]]);for(let i=0;i<queue.length;i++){const id=queue[i];if(id===target)break;for(const d of this.maps.maps.find(r=>r.id===id).portals)if(!parent.has(d.target)){parent.set(d.target,id);queue.push(d.target);}}if(!parent.has(target))return null;let id=target;while(parent.get(id)!==this.room&&parent.get(id))id=parent.get(id);return id;}
   update(dt,player,playerRoom){
    if(this.delay>0){this.delay=Math.max(0,this.delay-dt);return false;}const room=this.maps.maps.find(r=>r.id===this.room);let goal=player,door;
@@ -30,5 +31,5 @@ globalThis.ChaseSystem=(()=>{
    return this.room===playerRoom&&Math.abs(this.actor.x-player.x)<this.actor.halfWidth+player.halfWidth&&Math.abs(this.actor.y-player.y)<this.actor.halfHeight+player.halfHeight;
   }
  }
- return {valid,findPath,spawn,visible,Pursuit};
+ return {valid,findPath,spawn,visible,speedAfterDeaths,Pursuit};
 })();

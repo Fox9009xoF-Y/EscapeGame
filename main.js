@@ -52,7 +52,7 @@ const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const playerSession = typeof PlayerSystem !== 'undefined' && typeof RoomMaps !== 'undefined'
   ? PlayerSystem.createSession(globalThis, document, RoomMaps.currentMap) : null;
-const portalController = playerSession && typeof PortalSystem !== 'undefined' ? new PortalSystem.Controller(RoomMaps) : null;
+const portalController = playerSession && typeof PortalSystem !== 'undefined' ? new PortalSystem.Controller(RoomMaps,{transition:runSceneTransition}) : null;
 const interactionController = playerSession && typeof InteractionSystem !== 'undefined' ? new InteractionSystem.Controller(RoomMaps) : null;
 
 function clearGameInput() {
@@ -61,8 +61,11 @@ function clearGameInput() {
   playerSession.input.spaceDown = false;
   playerSession.input.interactQueued = false;
 }
+const transitionController=typeof TransitionSystem!=='undefined'?new TransitionSystem.Controller({element:document.getElementById('scene-fade'),clearInput:clearGameInput}):null;
+function runSceneTransition(action){if(transitionController)return transitionController.begin(action);action();return true;}
+if(transitionController)for(const type of ['pointerdown','click','keydown','keyup'])globalThis.addEventListener(type,e=>{if(transitionController.active){e.preventDefault();e.stopImmediatePropagation();clearGameInput();}},{capture:true});
 const storyController = typeof StorySystem !== 'undefined' ? StorySystem.mount({
-  document, target: globalThis, clearInput: clearGameInput,
+  document, target: globalThis, clearInput: clearGameInput, transition:runSceneTransition,
   preview: ['living', 'bedroom', 'library'].includes(new URLSearchParams(location.search).get('room')),
   onPuzzle() {
     RoomMaps.setCurrentMap('living');
@@ -76,11 +79,12 @@ const storyController = typeof StorySystem !== 'undefined' ? StorySystem.mount({
 
 // ?room= 保留純場景預覽，完整遊戲從預設首頁開始。
 const gameController = typeof PuzzleSystem !== 'undefined' && !['living','bedroom','library'].includes(new URLSearchParams(location.search).get('room'))
-  ? PuzzleSystem.mount({document, target:globalThis, maps:RoomMaps, session:playerSession, portals:portalController, clearInput:clearGameInput,
-      onExit:()=>storyController.completeEscape(true)}) : null;
-if (gameController && interactionController) interactionController.onInteract = object => gameController.interact(object);
+  ? PuzzleSystem.mount({document, target:globalThis, maps:RoomMaps, session:playerSession, portals:portalController, clearInput:clearGameInput, transition:runSceneTransition,
+      onExit:()=>storyController.showSuccess()}) : null;
+if (gameController && interactionController) {interactionController.onInteract = object => gameController.interact(object);interactionController.escapeMode=()=>gameController.game.state.phase==='chase';}
 
 function update(deltaSeconds) {
+  if(transitionController?.active){transitionController.update(deltaSeconds);clearGameInput();return;}
   if (storyController && storyController.mode !== 'puzzle') {
     storyController.tick(performance.now());
     clearGameInput();
@@ -90,6 +94,7 @@ function update(deltaSeconds) {
     gameController.setVisible(true);
     if (gameController.blocking) { clearGameInput(); gameController.update(deltaSeconds); return; }
   }
+  if(typeof RoomMaps!=='undefined')RoomMaps.tickGlow?.(deltaSeconds);
   if (playerSession) { playerSession.setRoom(RoomMaps.currentMap); playerSession.update(deltaSeconds); }
   if (portalController) portalController.update(playerSession);
   if (interactionController) interactionController.update(playerSession);

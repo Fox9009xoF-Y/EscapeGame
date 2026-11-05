@@ -1,0 +1,3 @@
+// 既有驗證讀取場景狀態時等待新增的一秒轉場。轉場時間另由不套此前置的新測試驗證。
+const {chromium}=require('playwright'),launch=chromium.launch.bind(chromium);
+chromium.launch=async(...args)=>{const b=await launch(...args),newPage=b.newPage.bind(b);b.newPage=async(...opts)=>{const p=await newPage(...opts),evaluate=p.evaluate.bind(p);p.evaluate=async(...args)=>{await p.waitForFunction(()=>typeof transitionController==='undefined'||!transitionController?.active);const result=await evaluate(...args);await p.waitForFunction(()=>typeof transitionController==='undefined'||!transitionController?.active);return result;};return p;};return b;};

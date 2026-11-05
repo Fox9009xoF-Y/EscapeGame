@@ -84,3 +84,9 @@ canvas {
 #game-title-page { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2em; background:linear-gradient(#080d1740,#080d17b0); text-align:center; padding:5%; }
 #game-title-page h1 { color:#f4e4ba; font-size:clamp(24px,4.5cqw,58px); text-shadow:0 3px 12px #000; }
 #game-title-page #game-start { font-size:clamp(16px,2cqw,26px); padding:.6em 2em; }
+
+#scene-fade { position:absolute; inset:0; z-index:50; background:#000; pointer-events:auto; }
+#escape-success { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#101b23; color:#f4e4ba; text-align:center; cursor:pointer; }
+#escape-success h1 { font-size:clamp(28px,5cqw,64px); }
+#escape-success p { font-size:clamp(14px,1.8cqw,24px); }
+.star-azimuth { display:inline-block; margin-right:1em; text-shadow:0 1px 2px #000; }

@@ -11,6 +11,7 @@
   <script src="portals.js" defer></script>
   <script src="interactions.js" defer></script>
   <script src="door-labels.js" defer></script>
+  <script src="transitions.js" defer></script>
   <script src="story.js" defer></script>
   <script src="puzzles.js" defer></script>
   <script src="chase.js" defer></script>
@@ -24,6 +25,7 @@
   <svg id="door-labels" viewBox="0 0 1280 720" role="img" aria-label="門外目的房間指引"></svg>
   <section id="story-layer" aria-label="劇情演出">
     <img id="story-background" alt="當前章節背景" hidden>
+    <div id="escape-success" hidden role="button" tabindex="0" aria-label="逃脫成功，滑鼠左鍵繼續"><h1>逃脫成功</h1><p>滑鼠左鍵繼續</p></div>
     <div id="game-title-page" hidden><h1>密室逃脫之在杰難逃</h1><button id="game-start" type="button">開始遊戲</button></div>
     <div id="story-cast" aria-label="本章人物" hidden></div>
     <button id="story-pause" type="button" hidden>暫停</button>
@@ -48,6 +50,7 @@
     </div>
     <div id="wall-dialogue" role="button" tabindex="0" aria-label="下一句觀星對話" hidden><div id="wall-dialogue-speaker"></div><div id="wall-dialogue-text" aria-live="polite"></div><div class="wall-dialogue-guidance">左鍵／空白鍵 下一句</div></div>
   </section>
+    <div id="scene-fade" aria-hidden="true" hidden></div>
   </div>
 </body>
 </html>

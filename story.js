@@ -26,8 +26,8 @@ globalThis.StorySystem = (() => {
     return chapters;
   }
   class Controller {
-    constructor({onChange=()=>{},onPuzzle=()=>{},onFinished=()=>{}}={}) {
-      Object.assign(this,{onChange,onPuzzle,onFinished,mode:'loading',paused:false,chapterIndex:0,lineIndex:0,revision:0,generation:0,lastAdvance:-Infinity}); this.cancelHold();
+    constructor({onChange=()=>{},onPuzzle=()=>{},onFinished=()=>{},transition=action=>{action();return true;}}={}) {
+      Object.assign(this,{onChange,onPuzzle,onFinished,transition,mode:'loading',paused:false,chapterIndex:0,lineIndex:0,revision:0,generation:0,lastAdvance:-Infinity}); this.cancelHold();
     }
     notify() {this.revision++;this.onChange(this.snapshot());}
     snapshot() {
@@ -38,7 +38,7 @@ globalThis.StorySystem = (() => {
         text:line?.text||(this.mode==='error'?this.error:''),lineIndex:this.lineIndex,lineCount:chapter?.lines.length||0};
     }
     loadEmbedded(texts=builtInTexts){this.generation++;this.paused=false;this.cancelHold();try{this.opening=parse(texts.opening);this.ending=parse(texts.ending);this.chapterIndex=0;this.lineIndex=0;this.mode='title';}catch(error){this.mode='error';this.error='劇情載入失敗：'+error.message;}this.notify();}
-    startGame(){if(this.mode!=='title')return false;this.chapters=this.opening;this.chapterIndex=0;this.lineIndex=0;this.lastAdvance=-Infinity;this.paused=false;this.cancelHold();this.mode='opening';this.notify();return true;}
+    startGame(){if(this.mode!=='title')return false;return this.performTransition(()=>{this.chapters=this.opening;this.chapterIndex=0;this.lineIndex=0;this.lastAdvance=-Infinity;this.paused=false;this.cancelHold();this.mode='opening';this.notify();});}
     async load(fetcher) {
       const generation=++this.generation;
       this.mode='loading';this.paused=false;this.cancelHold();this.notify();
@@ -69,17 +69,12 @@ globalThis.StorySystem = (() => {
         return { ok: true, text: () => file.text() };
       });
     }
+    performTransition(action){if(this.transitionPending)return false;this.transitionPending=true;const accepted=this.transition(()=>{this.transitionPending=false;action();});if(accepted===false)this.transitionPending=false;return accepted!==false;}
     advance(now) {
-      if(this.paused||!['opening','ending'].includes(this.mode)||now-this.lastAdvance<160) return false;
-      this.lastAdvance=now;this.lineIndex++;
-      if(this.lineIndex>=this.chapters[this.chapterIndex].lines.length) {
-        this.lineIndex=0;this.chapterIndex++;
-        if(this.chapterIndex>=this.chapters.length) {
-          const opening=this.mode==='opening';this.mode=opening?'puzzle':'finished';this.cancelHold();this.notify();
-          if(opening)this.onPuzzle();else this.onFinished();return true;
-        }
-      }
-      this.notify();return true;
+      if(this.paused||this.transitionPending||!['opening','ending'].includes(this.mode)||now-this.lastAdvance<160)return false;
+      this.lastAdvance=now;const chapter=this.chapters[this.chapterIndex];
+      if(this.lineIndex===chapter.lines.length-1&&this.chapterIndex===this.chapters.length-1){const opening=this.mode==='opening';this.cancelHold();return this.performTransition(()=>{this.lineIndex=0;this.chapterIndex=this.chapters.length;this.mode=opening?'puzzle':'finished';this.notify();if(opening)this.onPuzzle();else this.onFinished();});}
+      this.lineIndex++;if(this.lineIndex>=chapter.lines.length){this.lineIndex=0;this.chapterIndex++;}this.notify();return true;
     }
     press(source,now,repeat=false) {
       if(repeat||this.paused||this.holdSource||!['opening','ending'].includes(this.mode)) return;
@@ -94,14 +89,14 @@ globalThis.StorySystem = (() => {
       }
     }
     setPaused(paused) {this.paused=paused;this.cancelHold();this.notify();}
+    showSuccess(){if(this.mode!=='puzzle')return false;return this.performTransition(()=>{this.mode='success';this.cancelHold();this.notify();});}
     completeEscape(confirmed) {
-      // N6 只在真正通過出口後呼叫，畫面沒有跳結尾按鈕。
-      if(confirmed!==true||this.mode!=='puzzle'||!this.ending?.length) return false;
-      this.chapters=this.ending;this.chapterIndex=0;this.lineIndex=0;this.mode='ending';this.paused=false;
-      this.lastAdvance=-Infinity;this.cancelHold();this.notify();return true;
+      if(confirmed!==true||!['puzzle','success'].includes(this.mode)||!this.ending?.length)return false;
+      return this.performTransition(()=>{this.chapters=this.ending;this.chapterIndex=0;this.lineIndex=0;this.mode='ending';this.paused=false;this.lastAdvance=-Infinity;this.cancelHold();this.notify();});
     }
+
   }
-  function mount({document,target,onPuzzle,clearInput=()=>{},preview=false}) {
+  function mount({document,target,onPuzzle,clearInput=()=>{},preview=false,transition=action=>{action();return true;}}) {
     const get=id=>document.getElementById(id),layer=get('story-layer'),background=get('story-background'),cast=get('story-cast');
     const dialogue=get('story-dialogue'),chapterLabel=get('story-chapter'),speaker=get('story-speaker'),text=get('story-text');
     const pause=get('story-pause'),status=get('story-status'),statusText=get('story-status-text'),retry=get('story-retry');
@@ -110,12 +105,12 @@ globalThis.StorySystem = (() => {
     const assetErrors=new Set(),assetWarning=get('story-asset-warning');
     const showErrors=()=>{assetWarning.textContent=assetErrors.size?`圖片載入失敗：${[...assetErrors].join('、')}，請確認圖檔後重新整理。`:'';assetWarning.hidden=assetErrors.size===0;};
     background.addEventListener('error',()=>{assetErrors.add(background.getAttribute('src'));showErrors();});
-    const controller=new Controller({onPuzzle,onChange:render});
+    const controller=new Controller({onPuzzle,onChange:render,transition});
     function render(state) {
       if(lastRevision===state.revision)return;lastRevision=state.revision;
       const active=['opening','ending'].includes(state.mode);
       layer.hidden=state.mode==='puzzle';dialogue.hidden=!active;pause.hidden=!active;background.hidden=!active;cast.hidden=!active;
-      status.hidden=active||state.mode==='puzzle'||state.mode==='title';retry.hidden=state.mode!=='error';titlePage.hidden=state.mode!=='title';
+      status.hidden=active||state.mode==='puzzle'||state.mode==='title';retry.hidden=state.mode!=='error';titlePage.hidden=state.mode!=='title';get('escape-success').hidden=state.mode!=='success';if(state.mode==='success')status.hidden=true;
       statusText.textContent=state.mode==='finished'?'全劇終\n感謝遊玩《密室逃脫之在杰難逃》':state.mode==='error'?state.text:state.mode==='awaiting-files'?'請選取劇本，開始遊戲':'正在載入劇情…';
       get('door-labels').hidden=state.mode!=='puzzle';
       pause.textContent=state.paused?'繼續':'暫停';pause.setAttribute('aria-pressed',String(state.paused));
@@ -147,6 +142,7 @@ globalThis.StorySystem = (() => {
     }
     const now=()=>target.performance.now(),editable=e=>e.target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target?.tagName);
     target.addEventListener('pointerdown',e=>{
+      if(e.button===0&&controller.mode==='success'){e.preventDefault();controller.completeEscape(true);return;}
       if(e.button!==0||!['opening','ending'].includes(controller.mode)||editable(e))return;e.preventDefault();dialogue.focus({preventScroll:true});dialogue.setPointerCapture(e.pointerId);controller.press('pointer',now());
     });
     target.addEventListener('pointerup',()=>controller.release());target.addEventListener('pointercancel',()=>controller.cancelHold());

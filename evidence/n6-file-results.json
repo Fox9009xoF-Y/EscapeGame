@@ -5,6 +5,7 @@
   "doorOpenedSeparately": true,
   "walkOutsideRequired": true,
   "alarmStopped": true,
+  "successRequiresLeftClick": true,
   "openedExitRetry": {
     "room": "bedroom",
     "covered": true,

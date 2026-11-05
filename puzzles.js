@@ -1,6 +1,8 @@
 'use strict';
 globalThis.PuzzleSystem=(()=>{
- function calendarClue(){return {month:8,day:23,sun:'長',azimuths:[0,.75,2.2,4.1,5.2].map(a=>(a*180/Math.PI+225)%360)};}
+ const stars=Object.freeze([[0,1,'#fff1b0'],[.75,.8,'#80ccff'],[2.2,.95,'#ff9696'],[4.1,.88,'#91e5bb'],[5.2,.7,'#ceacff']].map(([angle,scale,color],i)=>Object.freeze({angle,scale,color,magnitude:i+1})));
+ function starClues(){return stars.map((s,i)=>({...s,azimuth:Math.round(calendarClue().azimuths[i])%360}));}
+ function calendarClue(){return {month:8,day:23,sun:'長',azimuths:stars.map(s=>(s.angle*180/Math.PI+225)%360)};}
  function paperDoors(room){const result=room.portals.map(d=>({center:d.center,normal:d.normal}));if(room.exit){const b=room.objects.find(o=>o.role==='escape-door').visualBounds;result.push({center:{x:b.x+b.width/2,y:b.y+b.height/2},normal:{x:0,y:1}});}return result;}
  const roomIds=['living','bedroom','library'];
  function stateAt(n){n=((n%24)+24)%24;return {sun:n%3,moon:n%4,angle:(n%8)*Math.PI/4,target:n===11};}
@@ -13,7 +15,8 @@ globalThis.PuzzleSystem=(()=>{
   toggleLamp(index){const s=this.state;if(s.phase!=='explore'||!Number.isInteger(index)||index<0||index>=5)return false;s.lampOn[index]=!s.lampOn[index];if(s.lampOn.every((on,i)=>on===[true,false,true,false,true][i])){s.lampsSolved=true;s.rewardSpawned=true;}return true;}
   collectBookmark(){const s=this.state;if(!s.rewardSpawned||s.rewardCollected)return false;s.rewardCollected=true;s.inventory.push('knot_bookmark');return true;}
   solveWord(text){const answer=String(text).replace(/[\s，。！？?!,.]/g,'');if(!['纏綿','缠绵','交纏'].includes(answer))return false;this.state.wordSolved=true;return true;}
-  beginChase(player){const s=this.state;if(s.phase!=='explore'||!s.wordSolved||!s.sunTaken||!s.lampsSolved||!s.rewardCollected||!s.inventory.includes('sun_key'))return false;s.phase='chase-intro';s.alarm=true;for(const room of roomIds)s.lights[room]=false;this.checkpoint=JSON.parse(JSON.stringify({state:s,player}));return true;}
+  canBeginChase(){const s=this.state;return s.phase==='explore'&&s.wordSolved&&s.sunTaken&&s.lampsSolved&&s.rewardCollected&&s.inventory.includes('sun_key');}
+  beginChase(player){const s=this.state;if(!this.canBeginChase())return false;s.phase='chase-intro';s.alarm=true;for(const room of roomIds)s.lights[room]=false;this.checkpoint=JSON.parse(JSON.stringify({state:s,player}));return true;}
   startChase(){if(!['chase-intro','retry'].includes(this.state.phase))return false;this.state.phase='chase';return true;}
   rewind(){if(!this.checkpoint)return null;this.attempts++;this.state=JSON.parse(JSON.stringify(this.checkpoint.state));this.state.phase='retry';return JSON.parse(JSON.stringify(this.checkpoint.player));}
   revealExit(){const s=this.state;if(s.phase!=='chase'||!s.inventory.includes('sun_key')||s.exitRevealed)return false;s.exitRevealed=true;return true;}
@@ -24,25 +27,25 @@ globalThis.PuzzleSystem=(()=>{
  function drawCelestial(ctx,n,x,y,w,h,taken=false){
   const s=stateAt(n),cx=x+w*.5,cy=y+h*.5,r=Math.min(w,h)*.10;
   ctx.save();ctx.fillStyle='#8a6c44';ctx.fillRect(x,y,w,h);ctx.fillStyle='#101b30';ctx.fillRect(x+3,y+3,w-6,h-6);
-  for(const [a,f]of[[0,1],[.75,.8],[2.2,.95],[4.1,.88],[5.2,.7]]){
+  for(const star of stars){const a=star.angle,f=star.scale;
    const t=a+s.angle,radius=Math.min(w*.42,h*.37),sx=cx+Math.cos(t)*radius*f,sy=cy+Math.sin(t)*radius*f;
-   ctx.fillStyle='#e0ddbd';ctx.beginPath();for(let i=0;i<8;i++){const rad=i%2?2:4,angle=i*Math.PI/4-Math.PI/2;const px=sx+Math.cos(angle)*rad,py=sy+Math.sin(angle)*rad;if(!i)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.fill();
+   ctx.fillStyle=star.color;ctx.beginPath();for(let i=0;i<8;i++){const rad=i%2?2:4,angle=i*Math.PI/4-Math.PI/2;const px=sx+Math.cos(angle)*rad,py=sy+Math.sin(angle)*rad;if(!i)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.fill();
   }
   if(!taken){ctx.strokeStyle='#e4bc61';ctx.lineWidth=Math.max(1,r*.18);for(let i=0;i<8;i++){const a=i*Math.PI/4,length=r*(.5+s.sun*.5);ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*(r+2),cy+Math.sin(a)*(r+2));ctx.lineTo(cx+Math.cos(a)*(r+2+length),cy+Math.sin(a)*(r+2+length));ctx.stroke();}ctx.fillStyle='#e4bc61';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();}
   else{ctx.strokeStyle='#5b6574';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();}
   const mx=x+w*.77,my=cy,mr=r*.95;ctx.save();ctx.beginPath();ctx.arc(mx,my,mr,0,Math.PI*2);ctx.clip();ctx.fillStyle='#222d45';ctx.fillRect(mx-mr,my-mr,2*mr,2*mr);ctx.fillStyle='#e4dfbf';if(s.moon===1)ctx.fillRect(mx,my-mr,mr,2*mr);if(s.moon===2)ctx.fillRect(mx-mr,my-mr,2*mr,2*mr);if(s.moon===3)ctx.fillRect(mx-mr,my-mr,mr,2*mr);ctx.restore();ctx.strokeStyle='#a6acc0';ctx.beginPath();ctx.arc(mx,my,mr,0,Math.PI*2);ctx.stroke();ctx.restore();
  }
  class Controller{
-  constructor(options){Object.assign(this,options);this.game=new Game();this.modal=null;this.visible=false;this.hints=0;this.toastUntil=0;const d=this.document;this.layer=d.getElementById('puzzle-layer');this.panel=d.getElementById('puzzle-modal');this.title=d.getElementById('puzzle-title');this.body=d.getElementById('puzzle-content');this.inventory=d.getElementById('puzzle-inventory');this.notice=d.getElementById('puzzle-notice');d.getElementById('puzzle-close').onclick=()=>this.close();d.getElementById('puzzle-hint').onclick=()=>this.hint();d.getElementById('puzzle-mute').onclick=()=>{this.muted=!this.muted;this.stopAlarm();d.getElementById('puzzle-mute').textContent=this.muted?'開啟音效':'靜音';};this.document.getElementById('wall-dialogue').onclick=()=>this.nextWallLine();this.target.addEventListener('keydown',e=>{if(this.wallLines&&e.code==='Space'&&!e.repeat&&!/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target?.tagName)){e.preventDefault();this.nextWallLine();return;}if(this.wallLines&&e.code==='Escape'){e.preventDefault();this.endWallLines();return;}if(e.code==='Escape'&&this.visible&&this.modal){e.preventDefault();this.close();}});}
-  get blocking(){return !!this.modal;}
+  constructor(options){Object.assign(this,options);this.transition=options.transition||(action=>{action();return true;});this.game=new Game();this.modal=null;this.visible=false;this.hints=0;this.toastUntil=0;const d=this.document;this.layer=d.getElementById('puzzle-layer');this.panel=d.getElementById('puzzle-modal');this.title=d.getElementById('puzzle-title');this.body=d.getElementById('puzzle-content');this.inventory=d.getElementById('puzzle-inventory');this.notice=d.getElementById('puzzle-notice');d.getElementById('puzzle-close').onclick=()=>this.close();d.getElementById('puzzle-hint').onclick=()=>this.hint();d.getElementById('puzzle-mute').onclick=()=>{this.muted=!this.muted;this.stopAlarm();d.getElementById('puzzle-mute').textContent=this.muted?'開啟音效':'靜音';};this.document.getElementById('wall-dialogue').onclick=()=>this.nextWallLine();this.target.addEventListener('keydown',e=>{if(this.wallLines&&e.code==='Space'&&!e.repeat&&!/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target?.tagName)){e.preventDefault();this.nextWallLine();return;}if(this.wallLines&&e.code==='Escape'){e.preventDefault();this.endWallLines();return;}if(e.code==='Escape'&&this.visible&&this.modal){e.preventDefault();this.close();}});}
+  get blocking(){return !!this.modal||!!this.wallLines;}
   element(tag,text){const el=this.document.createElement(tag);if(text!==undefined)el.textContent=text;return el;}
   button(label,action){const b=this.element('button',label);b.type='button';b.onclick=action;this.body.append(b);return b;}
   show(title,text,kind='text'){this.endWallLines();this.modal={kind,title,text};this.panel.hidden=false;this.title.textContent=title;this.body.replaceChildren();if(text)this.body.append(this.element('p',text));this.clearInput();}
-  close(){if(this.modal?.kind==='chase-intro')return;this.endWallLines();this.modal=null;this.panel.hidden=true;this.clearInput();}
+  close(silent=false){if(this.modal?.kind==='chase-intro')return;const leftWall=this.modal?.kind==='celestial';this.endWallLines();this.modal=null;this.panel.hidden=true;this.clearInput();if(leftWall&&!silent&&this.game.state.phase==='explore')this.startWallLines([{speaker:'彬彬',text:'這個星象，可能關燈欣賞會更好看...等等我在想什麼，我應該趕快逃出這裡'}]);}
   toast(text){this.notice.textContent=text;this.toastUntil=this.target.performance.now()+3000;this.refresh();}
   refresh(){const names={sun_key:'太陽鑰匙',knot_bookmark:'繩結書籤',body_note:'掉落的紙條'};this.inventory.textContent='道具：'+(this.game.state.inventory.map(id=>names[id]||id).join('、')||'無');if(this.game.state.rewardCollected){const b=this.element('button','看書籤');b.type='button';b.onclick=()=>this.bookmark();this.inventory.append(b);}if(this.game.state.inventory.includes('body_note')){const b=this.element('button','看紙條');b.type='button';b.onclick=()=>{if(this.game.state.phase==='explore')this.notePanel();else this.toast('現在只能先逃出去！');};this.inventory.append(b);}}
-  setVisible(visible){if(this.visible===visible)return;this.visible=visible;this.layer.hidden=!visible;if(!visible)this.close();else this.refresh();}
-  startWallLines(quote){this.wallLines=[{speaker:'彬彬',text:quote},{speaker:'彬彬的心裡話',text:'明明星空很亮，但環境怎麼好像有點陰暗。'}];this.wallLineIndex=0;this.document.getElementById('wall-dialogue').hidden=false;this.panel.classList.add('with-wall-dialogue');this.renderWallLine();this.document.getElementById('wall-dialogue').focus({preventScroll:true});}
+  setVisible(visible){if(this.visible===visible)return;this.visible=visible;this.layer.hidden=!visible;if(!visible)this.close(true);else this.refresh();}
+  startWallLines(quote){this.wallLines=Array.isArray(quote)?quote:[{speaker:'彬彬',text:quote},{speaker:'彬彬的心裡話',text:'明明星空很亮，但環境怎麼好像有點陰暗。'}];this.wallLineIndex=0;this.document.getElementById('wall-dialogue').hidden=false;if(this.modal)this.panel.classList.add('with-wall-dialogue');this.renderWallLine();this.document.getElementById('wall-dialogue').focus({preventScroll:true});}
   renderWallLine(){const line=this.wallLines[this.wallLineIndex];this.document.getElementById('wall-dialogue-speaker').textContent=line.speaker;this.document.getElementById('wall-dialogue-text').textContent=line.text;}
   nextWallLine(){if(!this.wallLines)return;this.clearInput();if(++this.wallLineIndex>=this.wallLines.length)this.endWallLines();else this.renderWallLine();}
   endWallLines(){this.wallLines=null;this.document.getElementById('wall-dialogue').hidden=true;this.panel.classList.remove('with-wall-dialogue');}
@@ -59,6 +62,7 @@ globalThis.PuzzleSystem=(()=>{
    if(this.game.state.phase==='chase'){this.toast('警報響著，得趕快逃出去！');return true;}
    if(object.role==='light-switch'){this.game.toggleLight(this.maps.currentMap.id);this.toast(this.game.state.lights[this.maps.currentMap.id]?'電燈亮了。':'電燈熄滅了。');return true;}
    if(object.id==='living-celestial'){this.celestialPanel(false,this.game.visitWall());return true;}
+   if(object.role==='moon-reference'){this.moonReference();return true;}
    if(object.id==='living-carpet-clue'){this.celestialPanel(true);return true;}
    if(object.id==='living-desk'){this.roomPaper();return true;}
    if(object.role==='oil-lamp'){
@@ -73,13 +77,18 @@ globalThis.PuzzleSystem=(()=>{
 
    return false;
   }
-  touchPillow(){const p=this.session.player;if(this.game.beginChase({room:this.maps.currentMap.id,x:p.x,y:p.y,direction:p.direction}))this.chaseIntro();else this.toast(!this.game.state.wordSolved?'先看看紙條，想清楚那個詞。':'還有機關或道具沒處理完。先調查其他地方，再回來看抱枕。');}
+  touchPillow(){if(!this.game.canBeginChase()){this.toast(!this.game.state.wordSolved?'先看看紙條，想清楚那個詞。':'還有機關或道具沒處理完。先調查其他地方，再回來看抱枕。');return;}const p=this.session.player,saved={room:this.maps.currentMap.id,x:p.x,y:p.y,direction:p.direction};this.transition(()=>{if(this.game.beginChase(saved))this.chaseIntro();});}
+  moonReference(){
+   this.show('農曆日與月相對照','','moon-reference');const c=this.element('canvas');c.width=640;c.height=250;c.setAttribute('aria-label','農曆日對照新月、上弦、滿月、下弦等月相示意');this.body.append(c);const x=c.getContext('2d');x.fillStyle='#d8c7a0';x.fillRect(0,0,640,250);const labels=['初一','初四','初八','十二','十五','十九','廿三','廿七'];
+   for(let i=0;i<8;i++){const cx=80+(i%4)*160,cy=i<4?65:180,r=28;x.save();x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.clip();x.fillStyle='#17233b';x.fillRect(cx-r,cy-r,r*2,r*2);x.fillStyle='#f6e9b8';if(i===1||i===2||i===3)x.fillRect(cx+(i===1?14:i===2?0:-14),cy-r,i===1?r:i===2?r:r*2,r*2);if(i===4)x.fillRect(cx-r,cy-r,r*2,r*2);if(i>=5)x.fillRect(cx-r,cy-r,i===5?42:i===6?28:14,r*2);x.restore();x.fillStyle='#44382b';x.font='18px sans-serif';x.textAlign='center';x.fillText(labels[i],cx,cy+49);}
+   this.body.append(this.element('p','月相依農曆日循環，此圖為示意。'));
+  }
   notePanel(){this.show('掉落的紙條','以軀體為題，以藤蔓為解，其心為何?','body-note');}
   calendarPanel(){
    const c=calendarClue();this.show('地毯下的月曆','','target');
    const canvas=this.element('canvas');canvas.width=480;canvas.height=200;canvas.setAttribute('aria-label','八月月曆，廿三日被圈起');this.body.append(canvas);const ctx=canvas.getContext('2d');ctx.fillStyle='#dfd0aa';ctx.fillRect(0,0,480,200);ctx.fillStyle='#493c2c';ctx.font='22px sans-serif';ctx.fillText('農曆 八月',22,30);ctx.font='16px sans-serif';for(let d=1;d<=30;d++){const x=28+((d-1)%7)*65,y=62+Math.floor((d-1)/7)*29;ctx.fillText(String(d),x,y);if(d===23){ctx.strokeStyle='#9b3836';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+9,y-5,14,0,Math.PI*2);ctx.stroke();}}
    this.body.append(this.element('p','農曆八月廿三'));
-   this.body.append(this.element('p','今日幸運方位（北為0°，順時針）：'+c.azimuths.map(v=>v.toFixed(2)+'°').join('、')));
+   const row=this.element('p','今日幸運方位（北為0°，順時針）：');for(const star of starClues()){const span=this.element('span',star.magnitude+'等星：'+star.azimuth+'°');span.className='star-azimuth';span.style.color=star.color;span.dataset.magnitude=star.magnitude;row.append(span);}this.body.append(row);
    this.body.append(this.element('p','今日幸運光芒：'+c.sun));
   }
   vinePicture(){const c=this.element('canvas');c.width=480;c.height=130;c.setAttribute('aria-label','藤蔓交纏心形石頭的意象');this.body.append(c);const x=c.getContext('2d');x.fillStyle='#101b25';x.fillRect(0,0,480,130);x.fillStyle='#9d6970';x.beginPath();x.moveTo(240,110);x.bezierCurveTo(120,45,195,-10,240,36);x.bezierCurveTo(285,-10,360,45,240,110);x.fill();for(let j=0;j<2;j++){x.strokeStyle=j?'#b4bd7c':'#659477';x.lineWidth=5;x.beginPath();for(let i=0;i<=160;i++){const px=100+i*1.8,py=65+Math.sin(i*.11+j*Math.PI)*28;if(!i)x.moveTo(px,py);else x.lineTo(px,py);}x.stroke();}}
@@ -88,7 +97,7 @@ globalThis.PuzzleSystem=(()=>{
    this.show(title,'請給我你的心臟，重量兩個字','word');this.vinePicture();const label=this.element('label','其心為何（兩個字）'),input=this.element('input');input.type='text';input.maxLength=24;input.setAttribute('aria-label','文字謎題答案');label.append(input);this.body.append(label);const feedback=this.element('p');this.body.append(feedback);
    const solve=()=>{if(this.game.solveWord(input.value)){this.show('彬彬的心裡話','纏綿...?該不會是要我和杰哥纏綿吧?','word-solved');this.body.append(this.element('p','想出了「纏綿」，還需要到房間裡實際調查。'));}else feedback.textContent=input.value.replace(/[\s，。！？?!,.]/g,'')==='纏繞'?'或許可以再更煽情一點':'再想想軀體與藤蔓相互纏繞、連綿的樣子。';};this.button('確認答案',solve);input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();solve();}});input.focus();
   }
-  chaseIntro(){this.pursuit=null;this.stopAlarm();this.show('彬彬','好暗，得趕快逃出去','chase-intro');this.body.append(this.element('p','警報響起了。帶著鑰匙，往客廳的書櫃後大門逃！'));this.button(this.game.state.phase==='retry'?'重新挑戰':'趕快逃！',()=>{if(!this.game.startChase())return;this.modal=null;this.panel.hidden=true;this.clearInput();const room=this.maps.currentMap,point=ChaseSystem.spawn(room,this.session.player);if(point)this.pursuit=new ChaseSystem.Pursuit({maps:this.maps,start:{room:room.id,...point},playerSpeed:this.session.player.speed});this.alarmClock=0;this.toast('警報響起！杰哥可能從牆邊出現。');}).focus();this.refresh();}
+  chaseIntro(){this.pursuit=null;this.stopAlarm();this.show('彬彬','好暗，得趕快逃出去','chase-intro');this.body.append(this.element('p','警報響起了。帶著鑰匙，往客廳的書櫃後大門逃！'));this.button(this.game.state.phase==='retry'?'重新挑戰':'趕快逃！',()=>this.transition(()=>{if(!this.game.startChase())return;this.modal=null;this.panel.hidden=true;this.clearInput();const room=this.maps.currentMap,point=ChaseSystem.spawn(room,this.session.player);if(point)this.pursuit=new ChaseSystem.Pursuit({maps:this.maps,start:{room:room.id,...point},playerSpeed:this.session.player.speed,deaths:this.game.attempts});this.alarmClock=0;this.toast('警報響起！杰哥可能從牆邊出現。');})).focus();this.refresh();}
   stopAlarm(){if(this.alarmOscillator){try{this.alarmOscillator.stop();}catch{}this.alarmOscillator=null;}}
   beep(){if(this.muted)return;try{const Audio=this.target.AudioContext||this.target.webkitAudioContext;if(!Audio)return;this.audio||=new Audio();this.audio.resume().catch(()=>{});const osc=this.audio.createOscillator(),gain=this.audio.createGain();osc.frequency.value=620;gain.gain.value=.035;osc.connect(gain);gain.connect(this.audio.destination);osc.start();osc.stop(this.audio.currentTime+.09);this.alarmOscillator=osc;osc.onended=()=>{osc.disconnect();gain.disconnect();if(this.alarmOscillator===osc)this.alarmOscillator=null;};}catch{/* 可見警報仍持續顯示。 */}}
   roomPaper(){
@@ -109,11 +118,11 @@ globalThis.PuzzleSystem=(()=>{
    if(this.game.state.phase==='chase'){
     if(exitReady(this.maps.currentMap,this.session.player,this.session.input.direction())&&this.game.finishExit()){this.stopAlarm();this.pursuit=null;this.clearInput();this.onExit();return;}
     this.alarmClock=(this.alarmClock||0)-dt;if(this.alarmClock<=0){this.beep();this.alarmClock=.7;}
-    if(this.pursuit?.update(dt,this.session.player,this.maps.currentMap.id)){const saved=this.game.rewind();this.maps.setExitRevealed(false);this.maps.setCurrentMap(saved.room);this.session.setRoom(this.maps.currentMap);Object.assign(this.session.player,{x:saved.x,y:saved.y,direction:saved.direction,moving:false,animationTime:0});this.portals.blocked=null;this.clearInput();this.chaseIntro();}
+    if(this.pursuit?.update(dt,this.session.player,this.maps.currentMap.id)){this.stopAlarm();this.transition(()=>{const saved=this.game.rewind();this.maps.setExitRevealed(false);this.maps.setCurrentMap(saved.room);this.session.setRoom(this.maps.currentMap);Object.assign(this.session.player,{x:saved.x,y:saved.y,direction:saved.direction,moving:false,animationTime:0});this.portals.blocked=null;this.clearInput();this.chaseIntro();});}
    }
    const status=this.document.getElementById('puzzle-alarm');if(status){status.hidden=!this.game.state.alarm;status.textContent='警報響起！'+(this.game.attempts?' 第'+(this.game.attempts+1)+'次逃離':'');}
    if(this.toastUntil&&this.target.performance.now()>this.toastUntil){this.notice.textContent='';this.toastUntil=0;}}
-  draw(ctx){const room=this.maps.currentMap,s=this.game.state;if(room.id==='living'){const b=room.objects.find(o=>o.id==='living-celestial').visualBounds;drawCelestial(ctx,s.cycle,b.x,b.y,b.width,b.height,s.sunTaken);}for(const o of room.objects.filter(o=>o.role==='oil-lamp')){const on=room.id==='bedroom'?s.lampOn[o.lampIndex]:(s.ambientLamps[o.id]??true);if(on){const b=o.visualBounds;ctx.fillStyle='#ffd273';ctx.beginPath();ctx.moveTo(b.x+8,b.y-3);ctx.lineTo(b.x+12,b.y+6);ctx.lineTo(b.x+4,b.y+6);ctx.closePath();ctx.fill();}}if(room.id==='library'&&s.rewardSpawned&&!s.rewardCollected){ctx.fillStyle='#d9bd70';ctx.fillRect(633,349,14,23);ctx.fillStyle='#804d43';ctx.fillRect(637,347,6,28);}const dark=['chase','chase-intro','retry'].includes(s.phase);
+  draw(ctx){const room=this.maps.currentMap,s=this.game.state;if(room.id==='living'){const b=room.objects.find(o=>o.id==='living-celestial').visualBounds;drawCelestial(ctx,s.cycle,b.x,b.y,b.width,b.height,s.sunTaken);}for(const o of room.objects.filter(o=>o.role==='oil-lamp')){const on=room.id==='bedroom'?s.lampOn[o.lampIndex]:(s.ambientLamps[o.id]??true);if(on){const b=o.visualBounds;ctx.fillStyle='#ffd273';ctx.beginPath();ctx.moveTo(b.x+8,b.y-3);ctx.lineTo(b.x+12,b.y+6);ctx.lineTo(b.x+4,b.y+6);ctx.closePath();ctx.fill();}}if(room.id==='library'&&s.rewardSpawned&&!s.rewardCollected){ctx.fillStyle='#d9bd70';ctx.fillRect(633,349,14,23);ctx.fillStyle='#804d43';ctx.fillRect(637,347,6,28);}const dark=['chase','chase-intro','retry','escaped'].includes(s.phase);
    if(room.id==='living'&&s.doorOpen){ctx.fillStyle='#090d14';ctx.fillRect(423,108,50,22);ctx.fillStyle='#c4ac76';ctx.fillRect(423,128,50,2);}
    if(dark){const p=this.session.player;ctx.save();ctx.fillStyle='#000';ctx.beginPath();ctx.rect(0,0,1280,720);ctx.moveTo(p.x+96,p.y);ctx.arc(p.x,p.y,96,0,Math.PI*2,true);ctx.fill('evenodd');ctx.restore();}
    else if(!s.lights[room.id]){ctx.save();ctx.fillStyle='rgba(0,0,8,.78)';ctx.fillRect(0,0,1280,720);ctx.restore();}
@@ -121,5 +130,5 @@ globalThis.PuzzleSystem=(()=>{
   get entities(){return this.pursuit&&this.game.state.phase==='chase'&&this.pursuit.delay<=0&&this.pursuit.room===this.maps.currentMap.id?[this.pursuit.actor]:[];}
  }
  function mount(options){return new Controller(options);}
- return {Game,Controller,stateAt,drawCelestial,calendarClue,paperDoors,exitReady,mount};
+ return {Game,Controller,stateAt,stars,starClues,drawCelestial,calendarClue,paperDoors,exitReady,mount};
 })();
