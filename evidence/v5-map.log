@@ -1,0 +1,92 @@
+開始 phase2
+{"id":"living","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3969,"smoothing":false}
+{"id":"bedroom","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":2978,"smoothing":false}
+{"id":"library","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3619,"smoothing":false}
+Chrome 實際渲染：三房裁切/素材/置中/1280×720/小視窗全部通過，無 JavaScript 錯誤。
+開始 phase3
+{"id":"living","violations":0,"obstacleSlide":20,"wallSlide":null,"width":1280,"height":720}
+{"id":"bedroom","violations":0,"obstacleSlide":20,"wallSlide":29.99999999999998,"width":1280,"height":720}
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(result.wallSlide>29.9)
+
+    at C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tools\verify-phase3.cjs:57:33 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+開始 phase2
+{"id":"living","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3969,"smoothing":false}
+{"id":"bedroom","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":2978,"smoothing":false}
+Error: UNKNOWN: unknown error, open 'C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\evidence\phase2-library.png'
+    at async open (node:internal/fs/promises:1345:25)
+    at async Object.writeFile (node:internal/fs/promises:1972:14)
+    at async _Page.screenshot (C:\Users\nicho\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\playwright-core\lib\coreBundle.js:61393:11)
+    at async C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tools\verify-phase2.cjs:55:7 {
+  errno: -4094,
+  code: 'UNKNOWN',
+  syscall: 'open',
+  path: 'C:\\Users\\nicho\\Documents\\學校課程使用程式\\學習分析工具\\MidS-Game_Project\\evidence\\phase2-library.png'
+}
+開始 phase2
+{"id":"living","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3969,"smoothing":false}
+{"id":"bedroom","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":2978,"smoothing":false}
+{"id":"library","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3619,"smoothing":false}
+Chrome 實際渲染：三房裁切/素材/置中/1280×720/小視窗全部通過，無 JavaScript 錯誤。
+開始 phase3
+{"id":"living","violations":0,"obstacleSlide":20,"wallSlide":null,"width":1280,"height":720}
+{"id":"bedroom","violations":0,"obstacleSlide":20,"wallSlide":29.99999999999998,"width":1280,"height":720}
+{"id":"library","violations":0,"obstacleSlide":20,"wallSlide":30.000000000000007,"width":1280,"height":720}
+Chrome 實際鍵盤：三房共24種方向按鍵/放鍵停止通過；48方向高速碰撞/障礙滑動/斜牆/固定相機通過。
+開始 phase4
+{"direction":"down","frame":{"asset":"hero-sprites.png","sx":16,"sy":16,"flip":false},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"direction":"up","frame":{"asset":"hero-back-walk.png","sx":0,"sy":0,"flip":false},"sources":["hero-back-walk.png"],"frames":[0,16,32]}
+{"direction":"left","frame":{"asset":"hero-sprites.png","sx":16,"sy":32,"flip":true},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"direction":"right","frame":{"asset":"hero-sprites.png","sx":16,"sy":32,"flip":false},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+AssertionError [ERR_ASSERTION]: 傢俱後角色應完全被不透明傢俱遮住
+
+23080 !== 0
+
+    at C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tools\verify-phase4.cjs:41:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 23080,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+開始 phase2
+{"id":"living","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3969,"smoothing":false}
+{"id":"bedroom","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":2978,"smoothing":false}
+{"id":"library","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3619,"smoothing":false}
+Chrome 實際渲染：三房裁切/素材/置中/1280×720/小視窗全部通過，無 JavaScript 錯誤。
+開始 phase3
+{"id":"living","violations":0,"obstacleSlide":20,"wallSlide":null,"width":1280,"height":720}
+{"id":"bedroom","violations":0,"obstacleSlide":20,"wallSlide":29.99999999999998,"width":1280,"height":720}
+{"id":"library","violations":0,"obstacleSlide":20,"wallSlide":30.000000000000007,"width":1280,"height":720}
+Chrome 實際鍵盤：三房共24種方向按鍵/放鍵停止通過；48方向高速碰撞/障礙滑動/斜牆/固定相機通過。
+開始 phase4
+{"direction":"down","frame":{"asset":"hero-sprites.png","sx":16,"sy":16,"flip":false},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"direction":"up","frame":{"asset":"hero-back-walk.png","sx":0,"sy":0,"flip":false},"sources":["hero-back-walk.png"],"frames":[0,16,32]}
+{"direction":"left","frame":{"asset":"hero-sprites.png","sx":16,"sy":32,"flip":true},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"direction":"right","frame":{"asset":"hero-sprites.png","sx":16,"sy":32,"flip":false},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"hiddenChanges":0,"frontChanges":374095}
+開始 phase5
+{"from":"living","id":"bedroom","name":"臥室","vertices":5,"violations":0,"leaks":0,"x":474.595763608514,"y":413.74309424395744,"width":1280,"height":720}
+{"from":"bedroom","id":"library","name":"藏書房","vertices":6,"violations":0,"leaks":0,"x":465.1672955930064,"y":460.93970895252806,"width":1280,"height":720}
+{"from":"library","id":"bedroom","name":"臥室","vertices":5,"violations":0,"leaks":0,"x":805.404236391486,"y":413.74309424395744,"width":1280,"height":720}
+{"from":"bedroom","id":"living","name":"客廳","vertices":4,"violations":0,"leaks":0,"x":838.5584412271571,"y":360,"width":1280,"height":720}
+全程真實Chrome鍵盤走位，四條雙向連接/按住不彈回/門後合法位置/三房輪廓與單房渲染通過，無JavaScript錯誤。
+開始 phase6
+{"room":"living","title":"舊沙發","open":true,"holdOnce":true,"close":true,"backRejected":true,"farRejected":true}
+{"room":"bedroom","title":"整理好的床","open":true,"holdOnce":true,"close":true,"backRejected":true,"farRejected":true}
+{"room":"library","title":"藏書架","open":true,"holdOnce":true,"close":true,"backRejected":true,"farRejected":true}
+三房Chrome真實keyboard靠近傢俱/空白鍵調查/長按/關閉/背向遠處拒絕全通過。
+開始 refinement
+{"room":"living","labels":[{"id":"living-bedroom","text":"臥室","perpendicular":1.1165101928417955e-14,"outside":true,"visible":true}],"aligned":true}
+{"room":"bedroom","labels":[{"id":"bedroom-living","text":"客廳","perpendicular":3.019806626980426e-14,"outside":true,"visible":true},{"id":"bedroom-library","text":"藏書房","perpendicular":-3.730349362740526e-14,"outside":true,"visible":true}],"aligned":true}
+{"room":"library","labels":[{"id":"library-bedroom","text":"臥室","perpendicular":-3.552713678800501e-15,"outside":true,"visible":true}],"aligned":true}
+{"count":15,"time":0.24999999999999997,"distance":90,"speed":360}

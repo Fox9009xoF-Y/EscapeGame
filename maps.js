@@ -32,7 +32,7 @@ globalThis.RoomMaps = (() => {
 
       {id:'living-moon-reference',role:'moon-reference',title:'月相對照紙',text:'牆上貼著農曆日與月相的對照圖。',bounds:box(790,140,52,44),wallMounted:true},
       { id:'living-carpet-clue', role:'carpet-clue', title:'地毯的一角', text:'地毯的一角微微翹起，底下露出一張紙。', bounds:box(624,340,24,16), floor:true },
-      { id:'living-desk', role:'desk', title:'書桌抽屜', text:'書桌抽屜裡露出一張摺好的紙。', bounds:box(800,188,56,48), solid:true },
+      { id:'living-desk', role:'desk', title:'書桌抽屜', text:'書桌抽屜裡露出一張摺好的紙。', bounds:box(736,252,56,48), solid:true },
       { id:'living-exit-bookshelf', role:'exit-bookshelf', title:'擋住門的書櫃', text:'書櫃後似乎有一道門。櫃側的鎖孔呈太陽形狀。', bounds:box(420,134,168,48), solid:true, modules:3 },
       { id:'living-exit', role:'escape-door', title:'書櫃後的大門', text:'大門被書櫃擋住，現在無法通過。', bounds:box(420,106,56,24), interaction:box(420,134,168,48), priority:-1, parentId:'living-exit-bookshelf' },
       { id:'living-lower-bookshelf', role:'bookshelf', title:'客廳下方書櫃', text:'書櫃裡放著幾本舊書。', bounds:box(432,506,104,44), solid:true },
@@ -62,10 +62,19 @@ globalThis.RoomMaps = (() => {
     ];
     const door=room.portals[0],c={x:door.center.x+door.tangent.x*52+door.normal.x*12,y:door.center.y+door.tangent.y*52+door.normal.y*12};
     defs.push({id:id+'-switch',role:'light-switch',title:'牆上開關',text:'牆上有一個老舊的電燈開關。',bounds:box(c.x-5,c.y-6,10,12),interaction:box(c.x+door.normal.x*18-9,c.y+door.normal.y*18-9,18,18),wallMounted:true,wallIndex:door.edgeIndex});
-    return defs.map(makeSceneObject);
+    return defs.map(def=>makeSceneObject(def,room));
   }
 
-  function makeSceneObject(def) {
+  function makeSceneObject(def,room) {
+      if(room?.id==='living'&&['celestial-wall','moon-reference'].includes(def.role)){
+        const b=def.bounds,top=Math.min(...room.innerVertices.map(v=>v.y));def={...def,solid:true,collision:{x:b.x,y:top,width:b.width,height:b.y+b.height-top}};
+      }
+      if(room?.id==='library'&&def.role==='bookshelf'){
+        const b=def.bounds,points=[{x:b.x,y:b.y},{x:b.x+b.width,y:b.y+b.height}];
+        if(def.orientation){const {center:c,tangent:t,normal:n}=def.orientation;for(const u of[-32,32])for(const v of[-44,13])points.push({x:c.x+t.x*u+n.x*v,y:c.y+t.y*u+n.y*v});}
+        else points.push({x:b.x,y:Math.min(...room.innerVertices.map(v=>v.y))});
+        const x=Math.min(...points.map(p=>p.x)),y=Math.min(...points.map(p=>p.y));def={...def,collision:{x,y,width:Math.max(...points.map(p=>p.x))-x,height:Math.max(...points.map(p=>p.y))-y}};
+      }
       const visualBounds = Object.freeze(def.bounds);
       const collision = def.collision ? Object.freeze(def.collision) : visualBounds;
       const interactionBounds = def.interaction ? Object.freeze(def.interaction) : collision;
@@ -166,7 +175,7 @@ globalThis.RoomMaps = (() => {
         {id:'library-0',role:'oil-lamp',title:'藏書房油燈',text:'書櫃旁放著一盞油燈。',bounds:box(780,430,16,28),collision:box(780,442,16,16),solid:true},
         {id:'library-1',role:'bookshelf',title:'藏書架',text:'書背都蒙著灰，只有一本書像是剛被放回去。',bounds:box(565,136,150,64),solid:true,wallMounted:true,wallIndex:4},
       ];
-      this.objects=Object.freeze(bases.map(makeSceneObject));
+      this.objects=Object.freeze(bases.map(def=>makeSceneObject(def,this)));
       this.obstacles=Object.freeze(this.objects.filter(o=>o.solid).map(o=>o.collision));
       this.portals = makePortals(this);
       const interiors = makeInteriors(this);
@@ -229,7 +238,7 @@ globalThis.RoomMaps = (() => {
   function drawGlows(ctx,room){ctx.save();ctx.beginPath();path(ctx,room.vertices);ctx.clip();ctx.globalAlpha=glowAlpha();ctx.fillStyle='#ffe5a1';ctx.shadowColor='#ffe5a1';ctx.shadowBlur=14;for(const o of room.objects.filter(o=>o.title&&o.text)){
     if(o.role==='escape-door'&&room.objects.some(p=>p.id===room.exit?.coverId))continue;const b=o.visualBounds||o.collision;ctx.fillRect(b.x,b.y,b.width,2);ctx.fillRect(b.x,b.y+b.height-2,b.width,2);ctx.fillRect(b.x,b.y,2,b.height);ctx.fillRect(b.x+b.width-2,b.y,2,b.height);
    }ctx.restore();}
-  function draw(ctx, entities = []) {
+  function draw(ctx, entities = [], drawObject = (ctx,o)=>o.draw(ctx)) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = '18px sans-serif';
@@ -279,7 +288,7 @@ globalThis.RoomMaps = (() => {
     }
     ctx.restore();
 
-    [...room.objects, ...entities].sort((a, b) => a.depth - b.depth).forEach(entity => entity.draw(ctx));
+    [...room.objects, ...entities].sort((a, b) => a.depth - b.depth).forEach(entity => room.objects.includes(entity)?drawObject(ctx,entity):entity.draw(ctx));
 
     drawGlows(ctx,room);
     ctx.fillStyle = '#c6c1b1';

@@ -29,7 +29,7 @@ const assert=require('node:assert/strict');
       gameLoop.stop();const p=playerSession.player,ctx=canvas.getContext('2d');
       const box=RoomMaps.currentMap.objects.find(o=>o.role==='sofa').collision;
       p.moving=false;p.direction='down';p.x=box.x+box.width/2;
-      ctx.fillStyle='#171b20';ctx.fillRect(0,0,1280,720);RoomMaps.draw(ctx,[]);
+      ctx.fillStyle='#171b20';ctx.fillRect(0,0,1280,720);RoomMaps.draw(ctx,[],(ctx,o)=>gameController?gameController.drawSceneObject(ctx,o):o.draw(ctx));
       if(gameController)gameController.draw(ctx);
       const baseline=ctx.getImageData(0,0,1280,720).data;
       p.y=box.y+box.height-23;draw();const behind=ctx.getImageData(0,0,1280,720).data;

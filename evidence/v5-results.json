@@ -1,0 +1,56 @@
+[
+  {
+    "protocol": "http",
+    "onboarding": true,
+    "glowColors": [
+      [
+        254,
+        227,
+        160
+      ],
+      [
+        168,
+        138,
+        91
+      ]
+    ],
+    "frontCollision": true,
+    "shelves": 6,
+    "standingMarkerDirections": [
+      "up",
+      "down",
+      "left",
+      "right"
+    ],
+    "rewardPicked": true,
+    "controlledMarkerFacing": true,
+    "errors": []
+  },
+  {
+    "protocol": "file",
+    "onboarding": true,
+    "glowColors": [
+      [
+        254,
+        227,
+        160
+      ],
+      [
+        168,
+        138,
+        91
+      ]
+    ],
+    "frontCollision": true,
+    "shelves": 6,
+    "standingMarkerDirections": [
+      "up",
+      "down",
+      "left",
+      "right"
+    ],
+    "rewardPicked": true,
+    "controlledMarkerFacing": true,
+    "errors": []
+  }
+]

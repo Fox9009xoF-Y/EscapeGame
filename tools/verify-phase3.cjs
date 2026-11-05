@@ -47,7 +47,8 @@ const fs = require('node:fs');
           const v=room.innerVertices,i=v.findIndex((a,i)=>Math.abs(v[(i+1)%v.length].x-a.x)>1 && Math.abs(v[(i+1)%v.length].y-a.y)>1);
           const a=v[i],b=v[(i+1)%v.length],length=Math.hypot(b.x-a.x,b.y-a.y),tx=(b.x-a.x)/length,ty=(b.y-a.y)/length,nx=-ty,ny=tx;
           const support=Math.abs(nx)*p.halfWidth+Math.abs(ny)*p.halfHeight;
-          p.x=(a.x+b.x)/2+nx*(support+0.001);p.y=(a.y+b.y)/2+ny*(support+0.001);
+          const along=room.id==='library'?.15:.5; // 新背櫃碰撞占用中點，仍測同一實際斜牆的空段。
+          p.x=a.x+(b.x-a.x)*along+nx*(support+0.001);p.y=a.y+(b.y-a.y)*along+ny*(support+0.001);
           const old={x:p.x,y:p.y};p.move(tx*30-nx*40,ty*30-ny*40,room);valid();wallSlide=(p.x-old.x)*tx+(p.y-old.y)*ty;
         }
         draw();

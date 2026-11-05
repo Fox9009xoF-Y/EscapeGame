@@ -50,7 +50,7 @@ test('對話框含物件標題、說明與關閉提示，關閉後不繪製',()=
 test('三房有不同居家傢俱與調查文字，傢俱碰撞和繪圖共用位置且完整位於內牆',()=>{
  const {maps}=load();for(const [i,role]of ['sofa','bed','bookshelf'].entries()){
  const room=maps.maps[i],object=room.objects.find(o=>o.role===role);assert.ok(object);assert.ok(object.title&&object.text);assert.ok(room.obstacles.includes(object.collision));
- const b=object.collision;for(const p of [{x:b.x,y:b.y},{x:b.x+b.width,y:b.y},{x:b.x,y:b.y+b.height},{x:b.x+b.width,y:b.y+b.height}])room.innerVertices.forEach((a,j)=>{const q=room.innerVertices[(j+1)%room.innerVertices.length];assert.ok((q.x-a.x)*(p.y-a.y)-(q.y-a.y)*(p.x-a.x)>=0);});
+ const b=object.collision;for(const p of [{x:b.x,y:b.y},{x:b.x+b.width,y:b.y},{x:b.x,y:b.y+b.height},{x:b.x+b.width,y:b.y+b.height}])room.innerVertices.forEach((a,j)=>{const q=room.innerVertices[(j+1)%room.innerVertices.length];assert.ok((q.x-a.x)*(p.y-a.y)-(q.y-a.y)*(p.x-a.x)>=-1e-7*Math.hypot(q.x-a.x,q.y-a.y));});
  }});
 test('入口載入互動模組並在繪圖與更新串接',()=>{
  const html=fs.readFileSync('index.html','utf8'),main=fs.readFileSync('main.js','utf8');assert.ok(html.indexOf('src="interactions.js"')>=0&&html.indexOf('src="interactions.js"')<html.indexOf('src="main.js"'));

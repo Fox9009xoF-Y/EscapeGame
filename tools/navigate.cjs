@@ -3,6 +3,8 @@ module.exports=async function navigate(page,goal){
  await page.waitForFunction(()=>typeof transitionController==='undefined'||!transitionController?.active);
  if(await page.evaluate(()=>typeof gameController!=='undefined'&&!!gameController?.wallLines&&!gameController.modal)){await page.keyboard.press('Space');await page.waitForTimeout(30);}
 
+ // 地板刻痕已全向互動：走到中心，不再以轉向多走一步離開範圍。
+ if(goal.id){const marker=await page.evaluate(id=>{const o=RoomMaps.currentMap.objects.find(o=>o.id===id);if(o?.role==='reward-marker'){const b=o.visualBounds;return{x:b.x+b.width/2,y:b.y+b.height/2};}},goal.id);if(marker)goal={point:marker};}
  const route=await page.evaluate(goal=>{
   const room=RoomMaps.currentMap,p=playerSession.player;
   // 大留白的路徑找不到時，採較細取樣；兩者仍大於真實腳部8×6。
