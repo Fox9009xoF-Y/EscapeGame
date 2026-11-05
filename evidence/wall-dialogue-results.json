@@ -1,0 +1,14 @@
+{
+  "dialogueStaysOnWall": true,
+  "noPortraits": true,
+  "viewportWidths": [
+    1280,
+    800
+  ],
+  "paper": {
+    "text": 0,
+    "red": 5
+  },
+  "nearAnswerNotSolved": true,
+  "adultBookShelves": 2
+}

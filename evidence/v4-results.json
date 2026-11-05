@@ -1,0 +1,20 @@
+[
+  {
+    "protocol": "http",
+    "choices": 3,
+    "independentHints": true,
+    "noWordCanvas": true,
+    "nearAnswers": 6,
+    "enterCorrect": true,
+    "errors": []
+  },
+  {
+    "protocol": "file",
+    "choices": 3,
+    "independentHints": true,
+    "noWordCanvas": true,
+    "nearAnswers": 6,
+    "enterCorrect": true,
+    "errors": []
+  }
+]

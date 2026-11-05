@@ -1,3 +1,4 @@
+const navigate=require('./navigate.cjs');
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 (async()=>{
@@ -20,13 +21,13 @@ const assert=require('node:assert/strict');
     for(let index=0;index<route.length;index++){
       const target=route[index],source=await page.evaluate(()=>RoomMaps.currentMap.id);
       // 使用真實鍵盤繞過既有柱子，不直接設定玩家座標。
-      await axis('y',270);await axis('x',640);
+      // 按更新後內裝尋路，門位與所有切換斷言維持。
       const approach=await page.evaluate(target=>{
         const door=RoomMaps.currentMap.portals.find(d=>d.target===target),p=playerSession.player;
         const inset=Math.abs(door.normal.x)*p.halfWidth+Math.abs(door.normal.y)*p.halfHeight+18;
         return {x:door.innerCenter.x+door.normal.x*inset,y:door.innerCenter.y+door.normal.y*inset,n:door.normal};
       },target);
-      await axis('x',approach.x);await axis('y',approach.y);
+      await navigate(page,{point:{x:approach.x,y:approach.y}});
       const keys=[];
       if(Math.abs(approach.n.x)>0.1)keys.push(approach.n.x>0?'ArrowLeft':'ArrowRight');
       if(Math.abs(approach.n.y)>0.1)keys.push(approach.n.y>0?'ArrowUp':'ArrowDown');

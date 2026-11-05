@@ -1,0 +1,2 @@
+// 僅供編修後同步，不是遊戲啟動依賴。
+const fs=require('fs');const data={opening:fs.readFileSync('story1.txt','utf8'),ending:fs.readFileSync('story2.txt','utf8')};const file=fs.readFileSync('story.js','utf8').replace(/\r\n/g,'\n');const result=file.replace(/(\/\/ BEGIN EMBEDDED STORY\n)[\s\S]*?(  \/\/ END EMBEDDED STORY)/,(_,a,b)=>a+'  const builtInTexts = Object.freeze('+JSON.stringify(data)+');\n'+b);if(result===file&&!file.includes(JSON.stringify(data)))throw Error('找不到內建劇本區塊');fs.writeFileSync('story.js',result);console.log('已同步原稿至程式內建劇本。');

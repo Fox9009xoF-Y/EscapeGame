@@ -1,0 +1,29 @@
+{
+  "checks": [
+    {
+      "width": 1280,
+      "kind": "target",
+      "actual": 2.400069436407823,
+      "intrinsic": 2.4
+    },
+    {
+      "width": 1280,
+      "kind": "paper",
+      "actual": 2.142901425914445,
+      "intrinsic": 2.142857142857143
+    },
+    {
+      "width": 800,
+      "kind": "target",
+      "actual": 2.4000904926191957,
+      "intrinsic": 2.4
+    },
+    {
+      "width": 800,
+      "kind": "paper",
+      "actual": 2.1429076402565266,
+      "intrinsic": 2.142857142857143
+    }
+  ],
+  "inventoryOverlap": false
+}

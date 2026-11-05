@@ -1,0 +1,4 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+function api(){const c=vm.createContext({});vm.runInContext(fs.readFileSync('story.js','utf8'),c);return c.StorySystem;}
+test('內建劇本完整保留原文，不需要網路與檔案選擇',()=>{const a=api();assert.equal(a.builtInTexts.opening,fs.readFileSync('story1.txt','utf8'));assert.equal(a.builtInTexts.ending,fs.readFileSync('story2.txt','utf8'));const c=new a.Controller();c.loadEmbedded();assert.equal(c.mode,'title');assert.equal(c.snapshot().text,'');assert.equal(c.startGame(),true);assert.equal(c.mode,'opening');assert.equal(c.lineIndex,0);assert.equal(c.startGame(),false);});
+test('內建來源缺漏有錯誤回饋，可以重載恢復到開始頁',()=>{const c=new(api().Controller)();c.loadEmbedded({opening:'',ending:''});assert.equal(c.mode,'error');c.loadEmbedded();assert.equal(c.mode,'title');assert.equal(c.startGame(),true);});

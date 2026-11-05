@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Escape Game</title>
+  <title>密室逃脫之在杰難逃</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
   <script src="maps.js" defer></script>
@@ -11,6 +11,10 @@
   <script src="portals.js" defer></script>
   <script src="interactions.js" defer></script>
   <script src="door-labels.js" defer></script>
+  <script src="transitions.js" defer></script>
+  <script src="story.js" defer></script>
+  <script src="puzzles.js" defer></script>
+  <script src="chase.js" defer></script>
   <script src="main.js" defer></script>
 </head>
 <body>
@@ -19,6 +23,34 @@
     請使用支援 HTML5 Canvas 的瀏覽器開啟遊戲。
   </canvas>
   <svg id="door-labels" viewBox="0 0 1280 720" role="img" aria-label="門外目的房間指引"></svg>
+  <section id="story-layer" aria-label="劇情演出">
+    <img id="story-background" alt="當前章節背景" hidden>
+    <div id="escape-success" hidden role="button" tabindex="0" aria-label="逃脫成功，按左鍵繼續"><h1>逃脫成功</h1><p>按左鍵繼續</p></div>
+    <div id="game-title-page" hidden><h1>密室逃脫之在杰難逃</h1><button id="game-start" type="button">開始遊戲</button></div>
+    <div id="story-cast" aria-label="本章人物" hidden></div>
+    <button id="story-pause" type="button" hidden>暫停</button>
+    <p id="story-asset-warning" role="alert" hidden></p>
+    <div id="story-dialogue" role="button" tabindex="0" aria-label="下一句對話" hidden>
+      <div id="story-chapter"></div>
+      <div id="story-speaker"></div>
+      <div id="story-text" aria-live="polite"></div>
+      <div id="story-guidance"></div>
+    </div>
+    <div id="story-status" role="status">
+      <p id="story-status-text">正在載入劇情…</p>
+      <button id="story-retry" type="button" hidden>重新載入</button>
+    </div>
+  </section>
+  <section id="puzzle-layer" hidden aria-label="解謎操作">
+    <div id="puzzle-hud"><span>彬彬的逃脫</span><span id="puzzle-inventory">道具：無</span><button id="puzzle-hint" type="button">提示</button><button id="puzzle-mute" type="button">靜音</button></div>
+    <p id="puzzle-alarm" hidden role="status">警報響起！</p>
+    <p id="puzzle-notice" role="status"></p>
+    <div id="puzzle-modal" hidden role="dialog" aria-modal="true" aria-labelledby="puzzle-title">
+      <div class="puzzle-card"><header><h2 id="puzzle-title"></h2><button id="puzzle-close" type="button">關閉</button></header><div id="puzzle-content"></div></div>
+    </div>
+    <div id="wall-dialogue" role="button" tabindex="0" aria-label="下一句觀星對話" hidden><div id="wall-dialogue-speaker"></div><div id="wall-dialogue-text" aria-live="polite"></div><div class="wall-dialogue-guidance">左鍵／空白鍵 下一句</div></div>
+  </section>
+    <div id="scene-fade" aria-hidden="true" hidden></div>
   </div>
 </body>
 </html>

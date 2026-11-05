@@ -1,0 +1,168 @@
+{
+  "results": [
+    {
+      "room": "living",
+      "id": "living-0",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-1",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-celestial",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-moon-reference",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-carpet-clue",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-desk",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-exit-bookshelf",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-lower-bookshelf",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-low-table",
+      "keyboardReachable": true
+    },
+    {
+      "room": "living",
+      "id": "living-switch",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-0",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-1",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-0",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-1",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-2",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-3",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lamp-4",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-pillow",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-low-table",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-lower-bookshelf",
+      "keyboardReachable": true
+    },
+    {
+      "room": "bedroom",
+      "id": "bedroom-switch",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-0",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-1",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-word-clue",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-reward-marker",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-lamp-1",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-wall-bookshelf-0",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-wall-bookshelf-1",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-wall-bookshelf-2",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-wall-bookshelf-3",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-wall-bookshelf-5",
+      "keyboardReachable": true
+    },
+    {
+      "room": "library",
+      "id": "library-switch",
+      "keyboardReachable": true
+    }
+  ],
+  "errors": [],
+  "exitLocked": true,
+  "puzzleLogicNotImplemented": true,
+  "headless": true
+}

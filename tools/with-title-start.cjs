@@ -1,0 +1,3 @@
+// 舊流程驗證先按新增開始按鈕；開始頁自身由獨立測試驗證，不使用此介面。
+const {chromium}=require('playwright'),launch=chromium.launch.bind(chromium);
+chromium.launch=async(...args)=>{const b=await launch(...args),newPage=b.newPage.bind(b);b.newPage=async(...opts)=>{const p=await newPage(...opts);for(const method of['goto','reload']){const original=p[method].bind(p);p[method]=async(...a)=>{const result=await original(...a);if(await p.locator('#game-start').count()){await p.waitForFunction(()=>typeof storyController!=='undefined');if(await p.locator('#game-start').isVisible())await p.locator('#game-start').click();await p.waitForFunction(()=>typeof transitionController==='undefined'||!transitionController?.active);}return result;};}return p;};return b;};

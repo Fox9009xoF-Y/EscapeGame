@@ -1,0 +1,55 @@
+本次八項線索修訂；自動Chrome檢查，非人工試玩。
+開始 verify-phase2.cjs
+{"id":"living","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3969,"smoothing":false}
+{"id":"bedroom","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":2978,"smoothing":false}
+{"id":"library","width":1280,"height":720,"centerX":640,"centerY":450,"leaks":0,"magenta":0,"sampled":3619,"smoothing":false}
+Chrome 實際渲染：三房裁切/素材/置中/1280×720/小視窗全部通過，無 JavaScript 錯誤。
+開始 verify-phase3.cjs
+{"id":"living","violations":0,"obstacleSlide":20,"wallSlide":null,"width":1280,"height":720}
+{"id":"bedroom","violations":0,"obstacleSlide":20,"wallSlide":29.99999999999998,"width":1280,"height":720}
+{"id":"library","violations":0,"obstacleSlide":20,"wallSlide":30,"width":1280,"height":720}
+Chrome 實際鍵盤：三房共24種方向按鍵/放鍵停止通過；48方向高速碰撞/障礙滑動/斜牆/固定相機通過。
+開始 verify-phase4.cjs
+{"direction":"down","frame":{"asset":"hero-sprites.png","sx":16,"sy":16,"flip":false},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"direction":"up","frame":{"asset":"hero-back-walk.png","sx":0,"sy":0,"flip":false},"sources":["hero-back-walk.png"],"frames":[0,16,32]}
+{"direction":"left","frame":{"asset":"hero-sprites.png","sx":16,"sy":32,"flip":true},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"direction":"right","frame":{"asset":"hero-sprites.png","sx":16,"sy":32,"flip":false},"sources":["hero-sprites.png"],"frames":[16,32,48]}
+{"hiddenChanges":0,"frontChanges":256860}
+開始 verify-phase5.cjs
+{"from":"living","id":"bedroom","name":"臥室","vertices":5,"violations":0,"leaks":0,"x":528.5957636085141,"y":413.74309424395744,"width":1280,"height":720}
+{"from":"bedroom","id":"library","name":"藏書房","vertices":6,"violations":0,"leaks":0,"x":503.35106177707974,"y":499.1234751366014,"width":1280,"height":720}
+{"from":"library","id":"bedroom","name":"臥室","vertices":5,"violations":0,"leaks":0,"x":762.9778295202929,"y":456.16950111515007,"width":1280,"height":720}
+{"from":"bedroom","id":"living","name":"客廳","vertices":4,"violations":0,"leaks":0,"x":800.3746750430832,"y":398.18376618407336,"width":1280,"height":720}
+全程真實Chrome鍵盤走位，四條雙向連接/按住不彈回/門後合法位置/三房輪廓與單房渲染通過，無JavaScript錯誤。
+開始 verify-phase6.cjs
+{"room":"living","title":"舊沙發","open":true,"holdOnce":true,"close":true,"backRejected":true,"farRejected":true}
+{"room":"bedroom","title":"整理好的床","open":true,"holdOnce":true,"close":true,"backRejected":true,"farRejected":true}
+{"room":"library","title":"藏書架","open":true,"holdOnce":true,"close":true,"backRejected":true,"farRejected":true}
+三房Chrome真實keyboard靠近傢俱/空白鍵調查/長按/關閉/背向遠處拒絕全通過。
+開始 verify-refinement.cjs
+{"room":"living","labels":[{"id":"living-bedroom","text":"臥室","perpendicular":1.1165101928417955e-14,"outside":true,"visible":true}],"aligned":true}
+{"room":"bedroom","labels":[{"id":"bedroom-living","text":"客廳","perpendicular":3.019806626980426e-14,"outside":true,"visible":true},{"id":"bedroom-library","text":"藏書房","perpendicular":-3.730349362740526e-14,"outside":true,"visible":true}],"aligned":true}
+{"room":"library","labels":[{"id":"library-bedroom","text":"臥室","perpendicular":-3.552713678800501e-15,"outside":true,"visible":true}],"aligned":true}
+{"count":16,"time":0.26666666666666666,"distance":96,"speed":360}
+開始 verify-n1.cjs
+{"results":["左鍵/空白鍵單句、快速連點抑制、劇情期間玩家不移動、說話跳動回位","鍵盤1.5秒/250ms快轉與鬆開停止、暫停/繼續按鍵可用","滑鼠長按快轉/放開、失焦取消快轉","開場 53 則逐句鍵盤播放與版面檢查、五章人物背景、清場進客廳並可移動","以確認逃脫介面隔離測第六章/800小視窗、逐句結尾與結束清場；真實大門逃脫另由N6全流程驗證","文本載入替換更新、404可見錯誤及原位重試"],"errors":[]}
+開始 verify-n1-boundaries.cjs
+{"lines":68,"smallViewportAllLines":true,"bounceUpAndReturn":true,"visibilityEventSimulated":true,"missingImageWarning":true}
+開始 verify-n1-local.cjs
+{"protocol":"file:","openingLines":53,"endingLines":16,"updatedText":true,"errors":[],"textRequests":[]}
+開始 verify-n2.cjs
+{"objects":31,"results":[{"room":"living","id":"living-0","keyboardReachable":true},{"room":"living","id":"living-1","keyboardReachable":true},{"room":"living","id":"living-celestial","keyboardReachable":true},{"room":"living","id":"living-carpet-clue","keyboardReachable":true},{"room":"living","id":"living-desk","keyboardReachable":true},{"room":"living","id":"living-exit-bookshelf","keyboardReachable":true},{"room":"living","id":"living-lower-bookshelf","keyboardReachable":true},{"room":"living","id":"living-low-table","keyboardReachable":true},{"room":"living","id":"living-switch","keyboardReachable":true},{"room":"bedroom","id":"bedroom-0","keyboardReachable":true},{"room":"bedroom","id":"bedroom-1","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-0","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-1","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-2","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-3","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-4","keyboardReachable":true},{"room":"bedroom","id":"bedroom-pillow","keyboardReachable":true},{"room":"bedroom","id":"bedroom-low-table","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lower-bookshelf","keyboardReachable":true},{"room":"bedroom","id":"bedroom-switch","keyboardReachable":true},{"room":"library","id":"library-0","keyboardReachable":true},{"room":"library","id":"library-1","keyboardReachable":true},{"room":"library","id":"library-word-clue","keyboardReachable":true},{"room":"library","id":"library-reward-marker","keyboardReachable":true},{"room":"library","id":"library-lamp-1","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-0","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-1","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-2","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-3","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-5","keyboardReachable":true},{"room":"library","id":"library-switch","keyboardReachable":true}],"errors":[]}
+開始 verify-story-controls.cjs
+全畫面五處點擊、1.5秒/每秒4句、放開停止通過
+開始 verify-puzzle-layout.cjs
+兩種視窗的天象/房形紙條比例及背包間距通過
+開始 verify-clue-revision.cjs
+八項線索文字/首見/掉落順序/唯一紙條/圖像檢查完成
+開始 verify-n3.cjs
+N3實走/22次開關/目標圖/錯誤拒絕/主動唯一鑰匙通過
+開始 verify-n4.cjs
+N4單張圖紙/全亮拒絕/正確組合/跨房主動拾取通過
+開始 verify-n5.cjs
+N5完整解題→抱枕→全暗96視野→216追捕→兩次被抓回溯通過
+開始 verify-n6.cjs
+N6真實鍵盤全流程、開門後被抓恢復書櫃碰撞、重試逃出與結尾後輸入檢查完成

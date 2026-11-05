@@ -1,0 +1,82 @@
+✖ 提示先選三類，文字首條指定文案，各類進度獨立且不依道具鎖定 (2.2163ms)
+✖ 文字題只留新描述與輸入，不產生圖形 (1.2446ms)
+✖ 六個近義詞均在答案框下提示，交纏不再算正解；正解仍可完成 (0.9815ms)
+✔ 追逐階段提示仍只提醒逃跑 (0.6729ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 1
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 82.9603
+
+✖ failing tests:
+
+test at tests\puzzle-v4.test.cjs:4:1
+✖ 提示先選三類，文字首條指定文案，各類進度獨立且不依道具鎖定 (2.2163ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   '星象謎題',
+  -   '圖形謎題',
+  -   '文字謎題'
+  - ]
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\puzzle-v4.test.cjs:4:77)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ '星象謎題', '圖形謎題', '文字謎題' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\puzzle-v4.test.cjs:5:1
+✖ 文字題只留新描述與輸入，不產生圖形 (1.2446ms)
+  AssertionError [ERR_ASSERTION]: 不可產生圖形
+      at c.vinePicture (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\puzzle-v4.test.cjs:5:74)
+      at Controller.wordPanel (evalmachine.<anonymous>:97:49)
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\puzzle-v4.test.cjs:5:91)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'fail',
+    diff: 'simple'
+  }
+
+test at tests\puzzle-v4.test.cjs:6:1
+✖ 六個近義詞均在答案框下提示，交纏不再算正解；正解仍可完成 (0.9815ms)
+  AssertionError [ERR_ASSERTION]: 纏繞
+  + actual - expected
+  
+  + '或許可以再更煽情一點'
+  - '換句話說，更杰哥一點'
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\puzzle-v4.test.cjs:6:326)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '或許可以再更煽情一點',
+    expected: '換句話說，更杰哥一點',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

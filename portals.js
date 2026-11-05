@@ -5,7 +5,7 @@ globalThis.PortalSystem = (() => {
   const distance = (player, door) => (player.x - door.innerCenter.x) * door.normal.x + (player.y - door.innerCenter.y) * door.normal.y;
 
   class Controller {
-    constructor(maps) { this.maps = maps; this.blocked = null; }
+    constructor(maps,{transition=action=>{action();return true;}}={}) { this.maps = maps; this.blocked = null; this.transition=transition; }
 
     update(session) {
       const { player, input } = session;
@@ -27,14 +27,7 @@ globalThis.PortalSystem = (() => {
         const inset = support(player, destination.normal) + 24;
         const x = destination.innerCenter.x + destination.normal.x * inset;
         const y = destination.innerCenter.y + destination.normal.y * inset;
-        if (!this.maps.setCurrentMap(next.id)) return false;
-        session.setRoom(next);
-        player.x = x; player.y = y;
-        player.moving = false; player.animationTime = 0;
-        const n = destination.normal;
-        player.direction = Math.abs(n.x) >= Math.abs(n.y) ? (n.x > 0 ? 'right' : 'left') : (n.y > 0 ? 'down' : 'up');
-        this.blocked = destination.id;
-        return true;
+        return this.transition(()=>{this.maps.setCurrentMap(next.id);session.setRoom(next);player.x=x;player.y=y;player.moving=false;player.animationTime=0;const n=destination.normal;player.direction=Math.abs(n.x)>=Math.abs(n.y)?(n.x>0?'right':'left'):(n.y>0?'down':'up');this.blocked=destination.id;});
       }
       return false;
     }

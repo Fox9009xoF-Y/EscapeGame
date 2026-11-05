@@ -1,0 +1,25 @@
+{
+  "nodePassed": 99,
+  "pythonAssetsPassed": 1,
+  "browserScripts": [
+    "verify-phase2.cjs",
+    "verify-phase3.cjs",
+    "verify-phase4.cjs",
+    "verify-phase5.cjs",
+    "verify-phase6.cjs",
+    "verify-refinement.cjs",
+    "verify-n1.cjs",
+    "verify-n1-boundaries.cjs",
+    "verify-n1-local.cjs",
+    "verify-n2.cjs",
+    "verify-story-controls.cjs",
+    "verify-puzzle-layout.cjs",
+    "verify-clue-revision.cjs",
+    "verify-n3.cjs",
+    "verify-n4.cjs",
+    "verify-n5.cjs",
+    "verify-n6.cjs"
+  ],
+  "browserPassed": 17,
+  "manualUserPlaytest": false
+}

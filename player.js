@@ -27,6 +27,7 @@ globalThis.PlayerSystem = (() => {
       target.addEventListener('keydown', event => {
         if (event.target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName)) return;
         if (event.code === 'Space') {
+          if(event.target?.tagName==='BUTTON')return;
           event.preventDefault();
           if (!this.spaceDown && !event.repeat) this.interactQueued = true;
           this.spaceDown = true;

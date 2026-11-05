@@ -52,21 +52,63 @@ const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const playerSession = typeof PlayerSystem !== 'undefined' && typeof RoomMaps !== 'undefined'
   ? PlayerSystem.createSession(globalThis, document, RoomMaps.currentMap) : null;
-const portalController = playerSession && typeof PortalSystem !== 'undefined' ? new PortalSystem.Controller(RoomMaps) : null;
+const portalController = playerSession && typeof PortalSystem !== 'undefined' ? new PortalSystem.Controller(RoomMaps,{transition:runSceneTransition}) : null;
 const interactionController = playerSession && typeof InteractionSystem !== 'undefined' ? new InteractionSystem.Controller(RoomMaps) : null;
 
+function clearGameInput() {
+  if (!playerSession) return;
+  playerSession.input.keys.clear();
+  playerSession.input.spaceDown = false;
+  playerSession.input.interactQueued = false;
+}
+const transitionController=typeof TransitionSystem!=='undefined'?new TransitionSystem.Controller({element:document.getElementById('scene-fade'),clearInput:clearGameInput}):null;
+function runSceneTransition(action){if(transitionController)return transitionController.begin(action);action();return true;}
+if(transitionController)for(const type of ['pointerdown','click','keydown','keyup'])globalThis.addEventListener(type,e=>{if(transitionController.active){e.preventDefault();e.stopImmediatePropagation();clearGameInput();}},{capture:true});
+const storyController = typeof StorySystem !== 'undefined' ? StorySystem.mount({
+  document, target: globalThis, clearInput: clearGameInput, transition:runSceneTransition,
+  preview: ['living', 'bedroom', 'library'].includes(new URLSearchParams(location.search).get('room')),
+  onPuzzle() {
+    RoomMaps.setCurrentMap('living');
+    playerSession.setRoom(RoomMaps.currentMap);
+    playerSession.player.x = 640; playerSession.player.y = 360;
+    playerSession.player.moving = false;
+    if (interactionController) interactionController.message = null;
+    clearGameInput();
+  },
+}) : null;
+
+// ?room= 保留純場景預覽，完整遊戲從預設首頁開始。
+const gameController = typeof PuzzleSystem !== 'undefined' && !['living','bedroom','library'].includes(new URLSearchParams(location.search).get('room'))
+  ? PuzzleSystem.mount({document, target:globalThis, maps:RoomMaps, session:playerSession, portals:portalController, clearInput:clearGameInput, transition:runSceneTransition,
+      onExit:()=>storyController.showSuccess()}) : null;
+if (gameController && interactionController) {interactionController.onInteract = object => gameController.interact(object);interactionController.escapeMode=()=>gameController.game.state.phase==='chase';}
+
 function update(deltaSeconds) {
-  if (playerSession) playerSession.update(deltaSeconds);
+  if(transitionController?.active){transitionController.update(deltaSeconds);clearGameInput();return;}
+  if (storyController && storyController.mode !== 'puzzle') {
+    storyController.tick(performance.now());
+    clearGameInput();
+    return;
+  }
+  if (gameController) {
+    gameController.setVisible(true);
+    if (gameController.blocking) { clearGameInput(); gameController.update(deltaSeconds); return; }
+  }
+  if(typeof RoomMaps!=='undefined')RoomMaps.tickGlow?.(deltaSeconds);
+  if (playerSession) { playerSession.setRoom(RoomMaps.currentMap); playerSession.update(deltaSeconds); }
   if (portalController) portalController.update(playerSession);
   if (interactionController) interactionController.update(playerSession);
+  if (gameController) gameController.update(deltaSeconds);
 }
 
 function draw() {
   ctx.fillStyle = '#171b20';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (storyController && storyController.mode !== 'puzzle') { if (gameController) gameController.setVisible(false); return; }
   if (typeof RoomMaps !== 'undefined') {
-    RoomMaps.draw(ctx, playerSession ? [playerSession.player] : []);
+    RoomMaps.draw(ctx, playerSession ? [playerSession.player, ...(gameController ? gameController.entities : [])] : []);
     if (typeof DoorLabels !== 'undefined') DoorLabels.render(document.getElementById('door-labels'), RoomMaps.currentMap);
+    if (gameController) gameController.draw(ctx);
     if (interactionController) interactionController.draw(ctx);
     return;
   }

@@ -1,0 +1,52 @@
+{
+  "fadeDurationMs": 1055,
+  "out": {
+    "mode": "title",
+    "opacity": 0.233333
+  },
+  "chapterTransitionsExcluded": true,
+  "colors": [
+    {
+      "text": "1等星：225°",
+      "matched": true
+    },
+    {
+      "text": "2等星：268°",
+      "matched": true
+    },
+    {
+      "text": "3等星：351°",
+      "matched": true
+    },
+    {
+      "text": "4等星：100°",
+      "matched": true
+    },
+    {
+      "text": "5等星：163°",
+      "matched": true
+    }
+  ],
+  "glowVaries": true,
+  "glowSamples": [
+    0.7897085370283432,
+    0.16691865361105163,
+    0.40733960136732894,
+    0.8997306616116876,
+    0.40708900023052,
+    0.16704226750543114,
+    0.7687524301973906,
+    0.7353795441990242,
+    0.1388220006146889
+  ],
+  "actualSpawnSpeedAtSixDeaths": 215.9,
+  "cover": {
+    "new": "exit-bookshelf"
+  },
+  "door": {
+    "new": "escape-door"
+  },
+  "wallDeparture": true,
+  "errors": [],
+  "artificialDeathCountFixture": true
+}
