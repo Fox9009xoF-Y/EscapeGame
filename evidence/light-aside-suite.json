@@ -1,0 +1,12 @@
+{
+  "node": 120,
+  "assets": 1,
+  "chromePrograms": 22,
+  "extraFileEscape": true,
+  "asideProtocols": [
+    "http",
+    "file"
+  ],
+  "manualPlaytest": false,
+  "verifyUnchanged": true
+}

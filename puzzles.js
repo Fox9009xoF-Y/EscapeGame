@@ -7,9 +7,9 @@ globalThis.PuzzleSystem=(()=>{
  const roomIds=['living','bedroom','library'];
  function stateAt(n){n=((n%24)+24)%24;return {sun:n%3,moon:n%4,angle:(n%8)*Math.PI/4,target:n===11};}
  class Game{
-  constructor(){this.state={phase:'explore',lights:{living:true,bedroom:true,library:true},cycle:0,sunTaken:false,wallSeen:false,inventory:[],lampOn:[false,false,false,false,false],lampsSolved:false,rewardSpawned:false,rewardCollected:false,ambientLamps:{},wordSolved:false,exitRevealed:false,doorOpen:false,alarm:false};this.attempts=0;}
+  constructor(){this.state={phase:'explore',lights:{living:true,bedroom:true,library:true},cycle:0,livingSwitchPresses:0,livingSwitchAsideShown:false,sunTaken:false,wallSeen:false,inventory:[],lampOn:[false,false,false,false,false],lampsSolved:false,rewardSpawned:false,rewardCollected:false,ambientLamps:{},wordSolved:false,exitRevealed:false,doorOpen:false,alarm:false};this.attempts=0;}
   collectNote(){if(this.state.inventory.includes('body_note'))return false;this.state.inventory.push('body_note');return true;}
-  toggleLight(room){if(!roomIds.includes(room)||this.state.phase!=='explore')return false;const s=this.state;s.lights[room]=!s.lights[room];if(room==='living'&&s.lights[room])s.cycle=(s.cycle+1)%24;return true;}
+  toggleLight(room){if(!roomIds.includes(room)||this.state.phase!=='explore')return false;const s=this.state;s.lights[room]=!s.lights[room];if(room==='living'){s.livingSwitchPresses++;if(s.lights[room])s.cycle=(s.cycle+1)%24;}return true;}
   visitWall(){const first=!this.state.wallSeen;this.state.wallSeen=true;return first?'原來傑哥也會觀星啊。':'';}
   touchSun(){const s=this.state;if(s.sunTaken||!stateAt(s.cycle).target)return false;s.sunTaken=true;s.inventory.push('sun_key');return true;}
   toggleLamp(index){const s=this.state;if(s.phase!=='explore'||!Number.isInteger(index)||index<0||index>=5)return false;s.lampOn[index]=!s.lampOn[index];if(s.lampOn.every((on,i)=>on===[true,false,true,false,true][i])){s.lampsSolved=true;s.rewardSpawned=true;}return true;}
@@ -60,7 +60,7 @@ globalThis.PuzzleSystem=(()=>{
    if(object.role==='exit-bookshelf'){if(this.game.revealExit()){this.maps.setExitRevealed(true);this.session.setRoom(this.maps.currentMap);this.toast('太陽鑰匙轉動了鎖孔，三連書櫃移開，露出大門。再調查大門開門！');}else this.toast('櫃側有太陽形狀的鎖孔。現在還不是離開的時候。');return true;}
    if(object.role==='escape-door'){if(this.game.openDoor())this.toast('大門開了！朝門外走，快逃！');else this.toast(this.game.state.doorOpen?'朝門外走！':'先用太陽鑰匙移開擋門書櫃。');return true;}
    if(this.game.state.phase==='chase'){this.toast('警報響著，得趕快逃出去！');return true;}
-   if(object.role==='light-switch'){this.game.toggleLight(this.maps.currentMap.id);this.toast(this.game.state.lights[this.maps.currentMap.id]?'電燈亮了。':'電燈熄滅了。');return true;}
+   if(object.role==='light-switch'){const room=this.maps.currentMap.id;if(!this.game.toggleLight(room))return true;const s=this.game.state;this.toast(s.lights[room]?'電燈亮了。':'電燈熄滅了。');if(room==='living'&&s.livingSwitchPresses===3&&!s.livingSwitchAsideShown){s.livingSwitchAsideShown=true;this.startWallLines([{speaker:'彬彬',text:'好暗，杰哥該不會突然跑出來吧'}]);}return true;}
    if(object.id==='living-celestial'){this.celestialPanel(false,this.game.visitWall());return true;}
    if(object.role==='moon-reference'){this.moonReference();return true;}
    if(object.id==='living-carpet-clue'){this.celestialPanel(true);return true;}

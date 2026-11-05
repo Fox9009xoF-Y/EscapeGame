@@ -1,0 +1,18 @@
+[
+  {
+    "protocol": "http",
+    "thirdPress": true,
+    "holdOnce": true,
+    "closeWithoutToggle": true,
+    "onceAcrossRooms": true,
+    "errors": []
+  },
+  {
+    "protocol": "file",
+    "thirdPress": true,
+    "holdOnce": true,
+    "closeWithoutToggle": true,
+    "onceAcrossRooms": true,
+    "errors": []
+  }
+]
