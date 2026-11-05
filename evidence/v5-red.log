@@ -1,0 +1,179 @@
+✖ 首次2D顯示清楚操作提示，切換顯示不重播 (4.7164ms)
+✖ 天象與月相紙的實體延伸至上牆，角色不能繞入背後 (8.1823ms)
+✖ 藏書房書櫃完整外觀及後方至牆皆有實體阻擋 (2.5946ms)
+✖ 中央刻痕四朝向、四周及站上方均可互動，遠處不觸發 (2.1317ms)
+✖ 圖形紙桌沿左下45度靠隔牆，保留4像素間隙 (1.9488ms)
+✖ 動態天象走排序繪圖再發光，避免最後覆寫光芒及玩家 (3.0877ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 99.8329
+
+✖ failing tests:
+
+test at tests\interaction-polish.test.cjs:3:1
+✖ 首次2D顯示清楚操作提示，切換顯示不重播 (4.7164ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   '可按空白鍵對發光物體進行互動'
+  - ]
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\interaction-polish.test.cjs:3:259)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ '可按空白鍵對發光物體進行互動' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\interaction-polish.test.cjs:4:1
+✖ 天象與月相紙的實體延伸至上牆，角色不能繞入背後 (8.1823ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(o.collision.y<=top)
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\interaction-polish.test.cjs:4:264)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\interaction-polish.test.cjs:5:1
+✖ 藏書房書櫃完整外觀及後方至牆皆有實體阻擋 (2.5946ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(c.y<=Math.min(...r.innerVertices.map(v=>v.y)))
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\interaction-polish.test.cjs:5:452)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\interaction-polish.test.cjs:6:1
+✖ 中央刻痕四朝向、四周及站上方均可互動，遠處不觸發 (2.1317ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + null
+  - {
+  -   collision: {
+  -     height: 28,
+  -     width: 28,
+  -     x: 626,
+  -     y: 346
+  -   },
+  -   cornerIndex: undefined,
+  -   depth: -10000,
+  -   draw: [Function: draw],
+  -   id: 'library-reward-marker',
+  -   interactionBounds: {
+  -     height: 8,
+  -     width: 28,
+  -     x: 626,
+  -     y: 374
+  -   },
+  -   lampIndex: undefined,
+  -   modules: undefined,
+  -   parentId: undefined,
+  -   priority: 0,
+  -   role: 'reward-marker',
+  -   solid: false,
+  -   text: '地板中央有一圈刻痕，中間空著。',
+  -   title: '中央刻痕',
+  -   visualBounds: {
+  -     height: 28,
+  -     width: 28,
+  -     x: 626,
+  -     y: 346
+  -   },
+  -   wallIndex: undefined,
+  -   wallMounted: false
+  - }
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\interaction-polish.test.cjs:6:249)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: [Object],
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\interaction-polish.test.cjs:7:1
+✖ 圖形紙桌沿左下45度靠隔牆，保留4像素間隙 (1.9488ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(b.x<800&&b.y>188)
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\interaction-polish.test.cjs:7:214)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\interaction-polish.test.cjs:8:1
+✖ 動態天象走排序繪圖再發光，避免最後覆寫光芒及玩家 (3.0877ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(events.indexOf('living-celestial')>=0)
+  
+      at TestContext.<anonymous> (C:\Users\nicho\Documents\學校課程使用程式\學習分析工具\MidS-Game_Project\tests\interaction-polish.test.cjs:8:309)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
