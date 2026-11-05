@@ -26,7 +26,7 @@ test('臥室五燈按入口方向順時針配置，抱枕位於床內而可從�
 test('藏書房有書櫃文字線索與可通行的中央生成標示，不先生成獎勵',()=>{
  const s=load(),r=s.RoomMaps.maps[2],marker=r.objects.find(o=>o.role==='reward-marker');assert.ok(marker);
  assert.equal(marker.solid,false);assert.equal(marker.visualBounds.x+marker.visualBounds.width/2,640);assert.equal(marker.visualBounds.y+marker.visualBounds.height/2,360);
- assert.ok(valid({x:640,y:360},r));assert.ok(r.objects.some(o=>o.role==='word-clue'));assert.ok(!r.objects.some(o=>o.role==='reward-item'));
+ assert.ok(valid({x:640,y:360},r));assert.ok(r.objects.some(o=>o.role==='purchase-list'));assert.ok(!r.objects.some(o=>o.role==='reward-item'));
 });
 test('所有新增物件有穩定ID、合法邊界、碰撞一致與可達互動點',()=>{
  const s=load();for(const r of s.RoomMaps.maps){
