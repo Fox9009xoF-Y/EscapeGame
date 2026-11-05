@@ -225,9 +225,9 @@ globalThis.RoomMaps = (() => {
 
   let glowTime=0;
   function tickGlow(dt){glowTime+=dt;}
-  function glowAlpha(){return .09+.055*(1+Math.sin(glowTime*2.2));}
-  function drawGlows(ctx,room){ctx.save();ctx.beginPath();path(ctx,room.vertices);ctx.clip();ctx.globalAlpha=glowAlpha();ctx.fillStyle='#ffe5a1';ctx.shadowColor='#ffe5a1';ctx.shadowBlur=7;for(const o of room.objects.filter(o=>o.title&&o.text)){
-    if(o.role==='escape-door'&&room.objects.some(p=>p.id===room.exit?.coverId))continue;const b=o.visualBounds||o.collision;ctx.fillRect(b.x,b.y,b.width,1);ctx.fillRect(b.x,b.y+b.height-1,b.width,1);ctx.fillRect(b.x,b.y,1,b.height);ctx.fillRect(b.x+b.width-1,b.y,1,b.height);
+  function glowAlpha(){return .12+.39*(1+Math.sin(glowTime*4.5));}
+  function drawGlows(ctx,room){ctx.save();ctx.beginPath();path(ctx,room.vertices);ctx.clip();ctx.globalAlpha=glowAlpha();ctx.fillStyle='#ffe5a1';ctx.shadowColor='#ffe5a1';ctx.shadowBlur=14;for(const o of room.objects.filter(o=>o.title&&o.text)){
+    if(o.role==='escape-door'&&room.objects.some(p=>p.id===room.exit?.coverId))continue;const b=o.visualBounds||o.collision;ctx.fillRect(b.x,b.y,b.width,2);ctx.fillRect(b.x,b.y+b.height-2,b.width,2);ctx.fillRect(b.x,b.y,2,b.height);ctx.fillRect(b.x+b.width-2,b.y,2,b.height);
    }ctx.restore();}
   function draw(ctx, entities = []) {
     ctx.textAlign = 'center';

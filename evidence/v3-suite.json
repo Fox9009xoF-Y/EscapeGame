@@ -1,0 +1,10 @@
+{
+  "node": 114,
+  "assets": 1,
+  "browserRegressionPrograms": 20,
+  "extraFileEscape": true,
+  "solarCases": 6,
+  "solarReproduced": false,
+  "manualPlaytest": false,
+  "verifyUnchanged": true
+}

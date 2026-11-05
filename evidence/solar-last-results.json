@@ -1,0 +1,85 @@
+{
+  "reproduced": false,
+  "cases": [
+    {
+      "protocol": "http",
+      "cycles": 11,
+      "before": {
+        "cycle": 11,
+        "lights": true,
+        "target": true
+      },
+      "picked": true,
+      "unique": true,
+      "wrongCycleRejected": true,
+      "errors": []
+    },
+    {
+      "protocol": "http",
+      "cycles": 35,
+      "before": {
+        "cycle": 11,
+        "lights": false,
+        "target": true
+      },
+      "picked": true,
+      "unique": true,
+      "wrongCycleRejected": true,
+      "errors": []
+    },
+    {
+      "protocol": "http",
+      "cycles": 59,
+      "before": {
+        "cycle": 11,
+        "lights": true,
+        "target": true
+      },
+      "picked": true,
+      "unique": true,
+      "wrongCycleRejected": true,
+      "errors": []
+    },
+    {
+      "protocol": "file",
+      "cycles": 11,
+      "before": {
+        "cycle": 11,
+        "lights": true,
+        "target": true
+      },
+      "picked": true,
+      "unique": true,
+      "wrongCycleRejected": true,
+      "errors": []
+    },
+    {
+      "protocol": "file",
+      "cycles": 35,
+      "before": {
+        "cycle": 11,
+        "lights": false,
+        "target": true
+      },
+      "picked": true,
+      "unique": true,
+      "wrongCycleRejected": true,
+      "errors": []
+    },
+    {
+      "protocol": "file",
+      "cycles": 59,
+      "before": {
+        "cycle": 11,
+        "lights": true,
+        "target": true
+      },
+      "picked": true,
+      "unique": true,
+      "wrongCycleRejected": true,
+      "errors": []
+    }
+  ],
+  "solarLogicModified": false,
+  "manualUserPlaytest": false
+}

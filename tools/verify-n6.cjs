@@ -33,7 +33,7 @@ const g=require('./gameplay.cjs'),navigate=require('./navigate.cjs'),prefix=proc
   assert.equal(await p.evaluate(()=>gameController.game.state.phase),'escaped');
   assert.equal(await p.evaluate(()=>gameController.game.state.alarm),false);
   assert.equal(await p.evaluate(()=>gameController.pursuit),null);
-  await p.screenshot({path:prefix+'-success.png'});await p.keyboard.press('Space');assert.equal(await p.evaluate(()=>storyController.mode),'success');await p.mouse.click(640,360,{button:'right'});assert.equal(await p.evaluate(()=>storyController.mode),'success');await p.locator('#escape-success').click();await g.idle(p);assert.equal(await p.evaluate(()=>storyController.mode),'ending');await p.screenshot({path:prefix+'-ending.png'});
+  assert.equal(await p.locator('#escape-success p').innerText(),'按左鍵繼續');await p.screenshot({path:prefix+'-success.png'});await p.keyboard.press('Space');assert.equal(await p.evaluate(()=>storyController.mode),'success');await p.mouse.click(640,360,{button:'right'});assert.equal(await p.evaluate(()=>storyController.mode),'success');await p.locator('#escape-success').click();await g.idle(p);assert.equal(await p.evaluate(()=>storyController.mode),'ending');await p.screenshot({path:prefix+'-ending.png'});
   let lines=0;while(await p.evaluate(()=>storyController.mode==='ending')){await p.keyboard.press('Space');await p.waitForTimeout(175);await g.idle(p);lines++;}
   assert.equal(await p.evaluate(()=>storyController.mode),'finished');
   for(let i=0;i<4;i++)await p.keyboard.press('Space');await p.mouse.click(640,360);await p.waitForTimeout(200);

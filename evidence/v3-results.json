@@ -1,0 +1,178 @@
+{
+  "ninth": {
+    "room": "bedroom",
+    "x": 776,
+    "y": 218.47541526872402,
+    "speed": 214.4,
+    "expected": {
+      "x": 776,
+      "y": 218.47541526872402
+    }
+  },
+  "tenthNoPursuit": true,
+  "interactionCases": [
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 450,
+        "y": 230
+      },
+      "direction": "up"
+    },
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 504,
+        "y": 158
+      },
+      "direction": "up"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 180
+      },
+      "direction": "up"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 118
+      },
+      "direction": "up"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 135
+      },
+      "direction": "up"
+    },
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 450,
+        "y": 230
+      },
+      "direction": "down"
+    },
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 504,
+        "y": 158
+      },
+      "direction": "down"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 180
+      },
+      "direction": "down"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 118
+      },
+      "direction": "down"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 135
+      },
+      "direction": "down"
+    },
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 450,
+        "y": 230
+      },
+      "direction": "left"
+    },
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 504,
+        "y": 158
+      },
+      "direction": "left"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 180
+      },
+      "direction": "left"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 118
+      },
+      "direction": "left"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 135
+      },
+      "direction": "left"
+    },
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 450,
+        "y": 230
+      },
+      "direction": "right"
+    },
+    {
+      "role": "exit-bookshelf",
+      "point": {
+        "x": 504,
+        "y": 158
+      },
+      "direction": "right"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 180
+      },
+      "direction": "right"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 118
+      },
+      "direction": "right"
+    },
+    {
+      "role": "escape-door",
+      "point": {
+        "x": 448,
+        "y": 135
+      },
+      "direction": "right"
+    }
+  ],
+  "controlledPositionAndDeathFixtures": true,
+  "successText": "按左鍵繼續",
+  "errors": []
+}
