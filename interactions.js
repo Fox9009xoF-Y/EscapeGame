@@ -8,7 +8,7 @@ globalThis.InteractionSystem = (() => {
     const choices=room.objects.filter(o=>roles.includes(o.role)&&o.title&&o.text&&!(o.role==='escape-door'&&o.parentId&&room.objects.some(c=>c.id===o.parentId))).map(o=>({o,b:rects(o).sort((a,b)=>gap(a)-gap(b))[0]})).filter(v=>v.b&&gap(v.b)<=reach).sort((a,b)=>gap(a.b)-gap(b.b));
     if(!choices.length)return null;const {o,b}=choices[0];if(rects(o).some(overlap))return o;
     const end={x:Math.max(b.x,Math.min(p.x,b.x+b.width)),y:Math.max(b.y,Math.min(p.y,b.y+b.height))};
-    const blocked=r=>{let lo=0,hi=1;for(const[at,delta,min,max]of[[p.x,end.x-p.x,r.x,r.x+r.width],[p.y,end.y-p.y,r.y,r.y+r.height]]){if(Math.abs(delta)<1e-9){if(at<=min||at>=max)return false;continue;}const a=(min-at)/delta,z=(max-at)/delta;lo=Math.max(lo,Math.min(a,z));hi=Math.min(hi,Math.max(a,z));if(lo>hi)return false;}return hi>0&&lo<1;};
+    const blocked=r=>{if(r.vertices)return !!CollisionShape.sweep({x:p.x,y:p.y,halfWidth:0,halfHeight:0},end.x-p.x,end.y-p.y,r);let lo=0,hi=1;for(const[at,delta,min,max]of[[p.x,end.x-p.x,r.x,r.x+r.width],[p.y,end.y-p.y,r.y,r.y+r.height]]){if(Math.abs(delta)<1e-9){if(at<=min||at>=max)return false;continue;}const a=(min-at)/delta,z=(max-at)/delta;lo=Math.max(lo,Math.min(a,z));hi=Math.min(hi,Math.max(a,z));if(lo>hi)return false;}return hi>0&&lo<1;};
     return room.obstacles.some(r=>r!==o.collision&&blocked(r))?null:o;
   }
   function findTarget(player,room,{escape=false}={}){
@@ -16,7 +16,7 @@ globalThis.InteractionSystem = (() => {
 
     const marker=nearTarget(player,room,['reward-marker'],32);if(marker)return marker;
     const p=player,boxFor=(mult=1)=>{const reach=32*mult,w=p.halfWidth*mult,h=p.halfHeight*mult;return p.direction==='up'?{x:p.x-w,y:p.y-p.halfHeight-reach,width:w*2,height:reach}:p.direction==='down'?{x:p.x-w,y:p.y+p.halfHeight,width:w*2,height:reach}:p.direction==='left'?{x:p.x-p.halfWidth-reach,y:p.y-h,width:reach,height:h*2}:{x:p.x+p.halfWidth,y:p.y-h,width:reach,height:h*2};};
-    const overlap=(b,box)=>b.x<box.x+box.width&&b.x+b.width>box.x&&b.y<box.y+box.height&&b.y+b.height>box.y;
+    const overlap=(b,box)=>CollisionShape.overlaps({x:box.x+box.width/2,y:box.y+box.height/2,halfWidth:box.width/2,halfHeight:box.height/2},b);
     const distance=b=>p.direction==='up'?p.y-b.y-b.height:p.direction==='down'?b.y-p.y:p.direction==='left'?p.x-b.x-b.width:b.x-p.x;
     const bounds=o=>o.interactionBounds||o.collision,mult=o=>escape&&['exit-bookshelf','escape-door'].includes(o.role)?2:1;
     const target=room.objects.filter(o=>!(escape&&['exit-bookshelf','escape-door'].includes(o.role))&&o.title&&o.text&&overlap(bounds(o),boxFor(mult(o)))).sort((a,b)=>distance(bounds(a))-distance(bounds(b))||(b.priority||0)-(a.priority||0))[0];

@@ -1,3 +1,4 @@
+const {overlaps}=require('./helpers/shape-check.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 function load(room='living'){
   class Image{set src(value){if(this.onload)this.onload();}}
@@ -21,7 +22,7 @@ function inside(p,room){
     const b=room.innerVertices[(i+1)%room.innerVertices.length],len=Math.hypot(b.x-a.x,b.y-a.y),n={x:-(b.y-a.y)/len,y:(b.x-a.x)/len};
     assert.ok((p.x-a.x)*n.x+(p.y-a.y)*n.y>=support(p,n)-1e-6,'出生/移動不可穿牆');
   });
-  for(const b of room.obstacles)assert.ok(p.x+p.halfWidth<=b.x || p.x-p.halfWidth>=b.x+b.width || p.y+p.halfHeight<=b.y || p.y-p.halfHeight>=b.y+b.height,'出生不可重疊障礙');
+  for(const b of room.obstacles)assert.ok(!overlaps(p,b),'出生不可重疊障礙');
 }
 
 test('四個雙向門位於指定邊，反向門存在且目標互相對應',()=>{

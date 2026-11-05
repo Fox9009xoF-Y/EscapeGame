@@ -42,6 +42,8 @@ globalThis.PlayerSystem = (() => {
         if (!Object.hasOwn(bindings, event.code)) return;
         this.keys.delete(event.code);
       });
+      target.addEventListener('contextmenu',event=>{if(event.target?.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName))return;if(event.target?.tagName==='CANVAS'||event.target?.closest?.('.game-stage'))event.preventDefault();});
+      target.addEventListener('pointercancel',clear);
       target.addEventListener('blur', clear);
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) clear();
@@ -65,31 +67,6 @@ globalThis.PlayerSystem = (() => {
       const length = Math.hypot(x, y) || 1;
       return { x: x / length, y: y / length };
     }
-  }
-
-  // 對矩形作 Minkowski 擴張，將腳部 AABB 的掃掠轉換為點對矩形的射線。
-  function sweepBox(player, dx, dy, box) {
-    const min = [box.x - player.halfWidth, box.y - player.halfHeight];
-    const max = [box.x + box.width + player.halfWidth, box.y + box.height + player.halfHeight];
-    const position = [player.x, player.y], velocity = [dx, dy];
-    let enter = -Infinity, exit = Infinity;
-    let normals = [];
-    for (let axis = 0; axis < 2; axis++) {
-      const p = position[axis], v = velocity[axis];
-      if (Math.abs(v) < epsilon) {
-        // 沿邊界平行行走不進入障礙內部，不應卡住。
-        if (p <= min[axis] + epsilon || p >= max[axis] - epsilon) return null;
-        continue;
-      }
-      const a = (min[axis] - p) / v, b = (max[axis] - p) / v;
-      const near = Math.min(a, b), far = Math.max(a, b);
-      const normal = axis === 0 ? { x: -Math.sign(v), y: 0 } : { x: 0, y: -Math.sign(v) };
-      if (near > enter + epsilon) { enter = near; normals = [normal]; }
-      else if (Math.abs(near - enter) <= epsilon) normals.push(normal);
-      exit = Math.min(exit, far);
-    }
-    if (enter < -epsilon || enter > 1 + epsilon || exit <= Math.max(0, enter) + epsilon) return null;
-    return { time: Math.max(0, enter), normals };
   }
 
   // 求最接近原始意圖、又不進入任何接觸面的可行向量。
@@ -155,18 +132,7 @@ globalThis.PlayerSystem = (() => {
           const support = Math.abs(nx) * this.halfWidth + Math.abs(ny) * this.halfHeight;
           if ((this.x - a.x) * nx + (this.y - a.y) * ny - support < 1e-6) touching.push({ x: nx, y: ny });
         }
-        for (const box of room.obstacles || []) {
-          const left = box.x - this.halfWidth, right = box.x + box.width + this.halfWidth;
-          const top = box.y - this.halfHeight, bottom = box.y + box.height + this.halfHeight;
-          if (this.y > top + epsilon && this.y < bottom - epsilon) {
-            if (Math.abs(this.x - left) < 1e-6) touching.push({ x: -1, y: 0 });
-            if (Math.abs(this.x - right) < 1e-6) touching.push({ x: 1, y: 0 });
-          }
-          if (this.x > left + epsilon && this.x < right - epsilon) {
-            if (Math.abs(this.y - top) < 1e-6) touching.push({ x: 0, y: -1 });
-            if (Math.abs(this.y - bottom) < 1e-6) touching.push({ x: 0, y: 1 });
-          }
-        }
+        for (const box of room.obstacles || []) touching.push(...CollisionShape.contacts(this,box));
         const motion = projectMotion(original.x * remaining, original.y * remaining, touching);
         dx = motion.x; dy = motion.y;
         if (Math.hypot(dx, dy) < epsilon) break;
@@ -188,7 +154,7 @@ globalThis.PlayerSystem = (() => {
             if (hitTime <= 1 + epsilon) contact({ time: Math.min(1, hitTime), normals: [{ x: nx, y: ny }] });
           }
         }
-        for (const box of room.obstacles || []) contact(sweepBox(this, dx, dy, box));
+        for (const box of room.obstacles || []) contact(CollisionShape.sweep(this, dx, dy, box));
         this.x += dx * time; this.y += dy * time;
         remaining *= 1 - time;
         if (remaining < epsilon) break;

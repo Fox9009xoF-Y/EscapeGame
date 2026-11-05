@@ -70,6 +70,7 @@ globalThis.PuzzleSystem=(()=>{
     else{const s=this.game.state;s.ambientLamps[object.id]=!(s.ambientLamps[object.id]??true);this.toast(s.ambientLamps[object.id]?'油燈點亮了。':'油燈熄滅了。');}return true;
    }
    if(object.role==='reward-marker'){if(this.game.collectBookmark()){this.toast('拿到了繩結書籤。');this.bookmark();}else if(this.game.state.rewardCollected)this.bookmark();else this.toast('中央刻痕裡還空著。');return true;}
+   if(object.role==='purchase-list'){this.show('杰哥A書代購清單',object.text,'purchase-list');return true;}
    if(object.role==='word-clue'){this.wordPanel();return true;}
    if(object.id==='bedroom-low-table'){this.show('矮桌上的紙條','祝你今晚好眠，同床共夢');return true;}
    if(object.id==='bedroom-lower-bookshelf'){if(!this.game.state.inventory.includes('body_note')){this.show('臥室下方書櫃','靠牆的書櫃塞著一些雜物','note-discovery');this.button('下一句',()=>{this.show('彬彬','好像有有什麼掉出來了','note-found');this.game.collectNote();this.refresh();this.button('查看紙條',()=>this.notePanel());});}else this.show('臥室下方書櫃','靠牆的書櫃塞著一些雜物');return true;}

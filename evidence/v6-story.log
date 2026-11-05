@@ -1,0 +1,32 @@
+開始 n1
+{"results":["左鍵/空白鍵單句、快速連點抑制、劇情期間玩家不移動、說話跳動回位","鍵盤1.5秒/250ms快轉與鬆開停止、暫停/繼續按鍵可用","滑鼠長按快轉/放開、失焦取消快轉","開場 53 則逐句鍵盤播放與版面檢查、五章人物背景、清場進客廳並可移動","以確認逃脫介面隔離測第六章/800小視窗、逐句結尾與結束清場；真實大門逃脫另由N6全流程驗證","內建原劇本，無玩家選檔介面；HTTP/file零TXT請求另由開始頁測試驗證"],"errors":[]}
+開始 n1-boundaries
+{"lines":68,"smallViewportAllLines":true,"bounceUpAndReturn":true,"visibilityEventSimulated":true,"missingImageWarning":true}
+開始 title
+HTTP/file開始頁、客廳背景、鍵鼠開始首句、完整內建劇情與零TXT請求通過
+開始 n2
+{"objects":32,"results":[{"room":"living","id":"living-0","keyboardReachable":true},{"room":"living","id":"living-1","keyboardReachable":true},{"room":"living","id":"living-celestial","keyboardReachable":true},{"room":"living","id":"living-moon-reference","keyboardReachable":true},{"room":"living","id":"living-carpet-clue","keyboardReachable":true},{"room":"living","id":"living-desk","keyboardReachable":true},{"room":"living","id":"living-exit-bookshelf","keyboardReachable":true},{"room":"living","id":"living-lower-bookshelf","keyboardReachable":true},{"room":"living","id":"living-low-table","keyboardReachable":true},{"room":"living","id":"living-switch","keyboardReachable":true},{"room":"bedroom","id":"bedroom-0","keyboardReachable":true},{"room":"bedroom","id":"bedroom-1","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-0","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-1","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-2","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-3","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-4","keyboardReachable":true},{"room":"bedroom","id":"bedroom-pillow","keyboardReachable":true},{"room":"bedroom","id":"bedroom-low-table","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lower-bookshelf","keyboardReachable":true},{"room":"bedroom","id":"bedroom-switch","keyboardReachable":true},{"room":"library","id":"library-0","keyboardReachable":true},{"room":"library","id":"library-1","keyboardReachable":true},{"room":"library","id":"library-word-clue","keyboardReachable":true},{"room":"library","id":"library-reward-marker","keyboardReachable":true},{"room":"library","id":"library-lamp-1","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-0","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-1","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-2","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-3","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-5","keyboardReachable":true},{"room":"library","id":"library-switch","keyboardReachable":true}],"errors":[]}
+開始 story-controls
+全畫面五處點擊、1.5秒/每秒4句、放開停止通過
+開始 puzzle-layout
+兩種視窗的天象/房形紙條比例及背包間距通過
+開始 clue-revision
+八項線索文字/首見/掉落順序/唯一紙條/圖像檢查完成
+開始 wall-dialogue
+底部兩句/不退出觀星/無立繪/兩視窗、無字五門圖、纏繞提示與兩座A書櫃通過
+開始 n1
+{"results":["左鍵/空白鍵單句、快速連點抑制、劇情期間玩家不移動、說話跳動回位","鍵盤1.5秒/250ms快轉與鬆開停止、暫停/繼續按鍵可用","滑鼠長按快轉/放開、失焦取消快轉","開場 53 則逐句鍵盤播放與版面檢查、五章人物背景、清場進客廳並可移動","以確認逃脫介面隔離測第六章/800小視窗、逐句結尾與結束清場；真實大門逃脫另由N6全流程驗證","內建原劇本，無玩家選檔介面；HTTP/file零TXT請求另由開始頁測試驗證"],"errors":[]}
+開始 n1-boundaries
+{"lines":68,"smallViewportAllLines":true,"bounceUpAndReturn":true,"visibilityEventSimulated":true,"missingImageWarning":true}
+開始 title
+HTTP/file開始頁、客廳背景、鍵鼠開始首句、完整內建劇情與零TXT請求通過
+開始 n2
+{"objects":32,"results":[{"room":"living","id":"living-0","keyboardReachable":true},{"room":"living","id":"living-1","keyboardReachable":true},{"room":"living","id":"living-celestial","keyboardReachable":true},{"room":"living","id":"living-moon-reference","keyboardReachable":true},{"room":"living","id":"living-carpet-clue","keyboardReachable":true},{"room":"living","id":"living-desk","keyboardReachable":true},{"room":"living","id":"living-exit-bookshelf","keyboardReachable":true},{"room":"living","id":"living-lower-bookshelf","keyboardReachable":true},{"room":"living","id":"living-low-table","keyboardReachable":true},{"room":"living","id":"living-switch","keyboardReachable":true},{"room":"bedroom","id":"bedroom-0","keyboardReachable":true},{"room":"bedroom","id":"bedroom-1","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-0","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-1","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-2","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-3","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lamp-4","keyboardReachable":true},{"room":"bedroom","id":"bedroom-pillow","keyboardReachable":true},{"room":"bedroom","id":"bedroom-low-table","keyboardReachable":true},{"room":"bedroom","id":"bedroom-lower-bookshelf","keyboardReachable":true},{"room":"bedroom","id":"bedroom-switch","keyboardReachable":true},{"room":"library","id":"library-0","keyboardReachable":true},{"room":"library","id":"library-1","keyboardReachable":true},{"room":"library","id":"library-word-clue","keyboardReachable":true},{"room":"library","id":"library-reward-marker","keyboardReachable":true},{"room":"library","id":"library-lamp-1","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-0","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-1","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-2","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-3","keyboardReachable":true},{"room":"library","id":"library-wall-bookshelf-5","keyboardReachable":true},{"room":"library","id":"library-switch","keyboardReachable":true}],"errors":[]}
+開始 story-controls
+全畫面五處點擊、1.5秒/每秒4句、放開停止通過
+開始 puzzle-layout
+兩種視窗的天象/房形紙條比例及背包間距通過
+開始 clue-revision
+八項線索文字/首見/掉落順序/唯一紙條/圖像檢查完成
+開始 wall-dialogue
+底部兩句/不退出觀星/無立繪/兩視窗、無字五門圖、纏繞提示與兩座A書櫃通過

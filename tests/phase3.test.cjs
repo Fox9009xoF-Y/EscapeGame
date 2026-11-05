@@ -1,3 +1,4 @@
+const {overlaps}=require('./helpers/shape-check.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -26,7 +27,7 @@ function inside(player,room) {
     assert.ok((player.x-a.x)*nx+(player.y-a.y)*ny >= Math.abs(nx)*player.halfWidth+Math.abs(ny)*player.halfHeight-1e-6, `${room.id} 邊 ${i} 穿牆`);
   }
   for(const box of room.obstacles || []) {
-    assert.ok(player.x+player.halfWidth<=box.x+1e-6 || player.x-player.halfWidth>=box.x+box.width-1e-6 || player.y+player.halfHeight<=box.y+1e-6 || player.y-player.halfHeight>=box.y+box.height-1e-6,'穿過障礙物');
+    assert.ok(!overlaps(player,box,1e-7),'穿過障礙物');
   }
 }
 const directions=[['KeyW',0,-1],['KeyA',-1,0],['KeyS',0,1],['KeyD',1,0],['ArrowUp',0,-1],['ArrowLeft',-1,0],['ArrowDown',0,1],['ArrowRight',1,0]];

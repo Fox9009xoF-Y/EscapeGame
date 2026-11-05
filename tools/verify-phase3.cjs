@@ -37,7 +37,7 @@ const fs = require('node:fs');
             const a=v[i],b=v[(i+1)%v.length],len=Math.hypot(b.x-a.x,b.y-a.y),nx=-(b.y-a.y)/len,ny=(b.x-a.x)/len;
             if((p.x-a.x)*nx+(p.y-a.y)*ny<Math.abs(nx)*p.halfWidth+Math.abs(ny)*p.halfHeight-1e-6)violations++;
           }
-          for(const b of room.obstacles) if(p.x+p.halfWidth>b.x+1e-6 && p.x-p.halfWidth<b.x+b.width-1e-6 && p.y+p.halfHeight>b.y+1e-6 && p.y-p.halfHeight<b.y+b.height-1e-6)violations++;
+          for(const b of room.obstacles) if(CollisionShape.overlaps(p,b,1e-7))violations++;
         };
         for(let i=0;i<48;i++) {p.x=640;p.y=300;const angle=i*Math.PI/24;p.move(Math.cos(angle)*20000,Math.sin(angle)*20000,room);valid();}
         const box=room.obstacles[0];p.x=box.x-8;p.y=box.y+10;const y=p.y;p.move(20,20,room);valid();
