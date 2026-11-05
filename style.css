@@ -80,3 +80,7 @@ canvas {
 #puzzle-modal.with-wall-dialogue { align-items:start; }
 #puzzle-modal.with-wall-dialogue .puzzle-card { max-height:62%; }
 #puzzle-modal.with-wall-dialogue canvas { width:min(100%,320px); margin-inline:auto; }
+
+#game-title-page { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2em; background:linear-gradient(#080d1740,#080d17b0); text-align:center; padding:5%; }
+#game-title-page h1 { color:#f4e4ba; font-size:clamp(24px,4.5cqw,58px); text-shadow:0 3px 12px #000; }
+#game-title-page #game-start { font-size:clamp(16px,2cqw,26px); padding:.6em 2em; }

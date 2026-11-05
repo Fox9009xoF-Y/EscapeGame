@@ -24,6 +24,7 @@
   <svg id="door-labels" viewBox="0 0 1280 720" role="img" aria-label="門外目的房間指引"></svg>
   <section id="story-layer" aria-label="劇情演出">
     <img id="story-background" alt="當前章節背景" hidden>
+    <div id="game-title-page" hidden><h1>密室逃脫之在杰難逃</h1><button id="game-start" type="button">開始遊戲</button></div>
     <div id="story-cast" aria-label="本章人物" hidden></div>
     <button id="story-pause" type="button" hidden>暫停</button>
     <p id="story-asset-warning" role="alert" hidden></p>
@@ -35,11 +36,6 @@
     </div>
     <div id="story-status" role="status">
       <p id="story-status-text">正在載入劇情…</p>
-      <div id="story-local-picker" hidden>
-        <label for="story-local-files">選擇此專案內的 story1.txt 與 story2.txt（可按住 Ctrl 同時選取）</label>
-        <input id="story-local-files" type="file" multiple accept=".txt,text/plain">
-        <p>直接開啟網頁時，需先選取兩份劇本。修改劇本後重新開啟並重選，即可讀取新內容。</p>
-      </div>
       <button id="story-retry" type="button" hidden>重新載入</button>
     </div>
   </section>

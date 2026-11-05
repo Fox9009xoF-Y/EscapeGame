@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "protocol": "http:",
+      "opening": 53,
+      "ending": 16,
+      "txtRequests": 0,
+      "reloadTitle": true,
+      "startDoesNotSkipLine": true
+    },
+    {
+      "protocol": "file:",
+      "opening": 53,
+      "ending": 16,
+      "txtRequests": 0,
+      "reloadTitle": true,
+      "startDoesNotSkipLine": true
+    }
+  ],
+  "manualUserPlaytest": false
+}

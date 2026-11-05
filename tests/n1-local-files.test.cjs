@@ -15,8 +15,4 @@ test('缺檔、同名重複或檔案讀取失敗需回饋錯誤，可重新選�
  }
  await c.loadFiles([file('story1.txt','第一章 開始\n阿偉：恢復'),file('story2.txt','第六章 結尾\n全劇終')]);assert.equal(c.mode,'opening');
 });
-test('入口提供本機劇本選擇，file 模式不直接啟動受限制的 fetch',()=>{
- const html=fs.readFileSync('index.html','utf8'),js=fs.readFileSync('story.js','utf8');
- assert.match(html,/id="story-local-files"[^>]*type="file"[^>]*multiple/);
- assert.match(js,/location\.protocol/);assert.match(js,/awaiting-files/);
-});
+test('正式入口以內建劇本開始，不提供選檔或呼叫文字fetch',()=>{const html=fs.readFileSync('index.html','utf8'),js=fs.readFileSync('story.js','utf8');assert.doesNotMatch(html,/type="file"/);assert.match(html,/id="game-start"/);assert.match(js,/else controller.loadEmbedded\(\)/);assert.doesNotMatch(js,/target.fetch/);});

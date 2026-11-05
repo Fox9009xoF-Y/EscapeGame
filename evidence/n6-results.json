@@ -1,4 +1,5 @@
 {
+  "protocol": "http:",
   "fullKeyboardEscape": true,
   "coverRemoved": true,
   "doorOpenedSeparately": true,

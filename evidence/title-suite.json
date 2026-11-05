@@ -1,0 +1,28 @@
+{
+  "nodePassed": 104,
+  "pythonAssetsPassed": 1,
+  "browserPrograms": 19,
+  "scripts": [
+    "verify-phase2.cjs",
+    "verify-phase3.cjs",
+    "verify-phase4.cjs",
+    "verify-phase5.cjs",
+    "verify-phase6.cjs",
+    "verify-refinement.cjs",
+    "verify-n1.cjs",
+    "verify-n1-boundaries.cjs",
+    "verify-title.cjs",
+    "verify-n2.cjs",
+    "verify-story-controls.cjs",
+    "verify-puzzle-layout.cjs",
+    "verify-clue-revision.cjs",
+    "verify-wall-dialogue.cjs",
+    "verify-n3.cjs",
+    "verify-n4.cjs",
+    "verify-n5.cjs",
+    "verify-n6.cjs",
+    "verify-n6.cjs（file直接開啟完整逃出）"
+  ],
+  "fileFullEscape": true,
+  "manualUserPlaytest": false
+}
